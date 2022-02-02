@@ -1,7 +1,7 @@
 import smbus2
 from time import sleep
 
-SLAVE_ADDR = 0x5B # Can be 0x5A
+SLAVE_ADDR = 0x5A # Can be 0x5A
 
 # Slave registers to read and write
 DEVICE_REG_STATUS = 0x00
@@ -29,6 +29,7 @@ def write_i2c_bus_dev(dev_reg, write_data):
     i2c_bus.write_i2c_block_data(SLAVE_ADDR, dev_reg, write_data)
 
 try:
+    print("Hello from python")
     if read_i2c_bus_dev(DEVICE_REG_STATUS, 1)[0] == DEVICE_STATE_BOOT:
         write_i2c_bus_dev(DEVICE_REG_APP_START, []) # empty write
         write_i2c_bus_dev(DEVICE_REG_MEAS_MODE, DEVICE_SET_MODE_10S)
