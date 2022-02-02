@@ -13,15 +13,15 @@ from time import sleep
 # Sensor class
 class MPRLS():
     # Sensor parameters, change depending on your sensor
-    ADDR = 0x18 # 18 for MPRLS
 
     def __init__(self, addr, bus):
         self.ADDR = addr
         self.bus = bus
+        self.readReq = [0x18, 0xAA, 0x00, 0x00]
 
     def getPressure(self):
-        self.bus.write_i2c_block_data(self.ADDR, 0, 0x18AA0000)
-        sleep(0.0005)
+        self.bus.write_i2c_block_data(self.ADDR, 0, self.readReq)
+        sleep(0.005)
         status = self.bus.read_i2c_block_data(self.ADDR, 3, 1)
         pressure = self.bus.read_i2c_block_data(self.ADDR, 0, 3)
         print("Current Status : " ,status)
