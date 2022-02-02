@@ -87,8 +87,8 @@ def main():
     bus = smbus2.SMBus(1)
     sensor = TH_SENSOR(bus) # Initialises sensor
     
-    print(sensor.getTemp)
-    print(sensor.getHumid)
+    print(sensor.getTemp())
+    print(sensor.getHumid())
 
 
 if __name__ == "__main__":
