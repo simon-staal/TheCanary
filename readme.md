@@ -28,6 +28,13 @@ Wiring: https://blog.adafruit.com/2017/08/14/updated-guide-adafruit-ccs811-air-q
 
 Guide: https://www.avimesa.com/docs/dev-kits/kit-5-air-quality-using-a-raspberry-pi/
 
+TVOC (less than 500 ppb): 
+    https://www.renesas.com/us/en/document/whp/overview-tvoc-and-indoor-air-quality
+    https://www.worldgbc.org/sites/default/files/bp-resource/BPFP-IEQ-Guidance-Note.pdf
+
+CO2 (less than 5000 ppm if exposed for several hours):
+    https://www.health.state.mn.us/communities/environment/air/toxins/co2.html#:~:text=This%20could%20occur%20when%20exposed,dangerous%20to%20life%20and%20health.
+
 Adafruit MPRLS Air Pressure Sensor
 -------------------------
 Company Website: https://www.adafruit.com/product/3965

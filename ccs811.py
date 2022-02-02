@@ -1,5 +1,6 @@
 import smbus2
 from time import sleep
+from time import time
 
 # Helper function to isolate a bit of a given byte
 def getBit(val, idx):
@@ -48,6 +49,7 @@ class SENSOR():
         self.bus.write_i2c_block_data(self.ADDR, self.REGS.APP_START, [])
     
     def printStatus(self):
+        print("==== SENSOR STATUS ====")
         status = self.status
 
         # Check in application mode
@@ -74,6 +76,7 @@ class SENSOR():
         print(f'ERROR: {ERROR}')
         if DATA_READY == 1: print('Data is ready to be read')
         if ERROR == 1: print('Read ERROR_ID')
+        print("=========================")
 
     def getMode(self):
         self.mode = self.bus.read_byte_data(self.ADDR, self.REGS.MODE)
@@ -81,6 +84,7 @@ class SENSOR():
         return self.mode
 
     def printMode(self):
+        print("==== SENSOR MODE ====")
         mode = self.mode
         DRIVE_MODE = f"{getBit(mode, 6)}{getBit(mode, 5)}{getBit(mode, 4)}"
         if DRIVE_MODE == "000": 
@@ -107,8 +111,15 @@ class SENSOR():
         print(f"INT_THRESH: {INT_THRESH}")
         assert INT_THRESH == 0, print("THRESHOLD INTERRUPT ENABLED, WE AREN'T USING THRESHOLDS")
 
+        print("=======================")
+
+
     def setMode(self, newMode=1, interrupt=0):
         assert newMode >= 0 and newMode <= 4, print(f"INVALID MODE: {newMode} (Please use a mode in the range [0-4])")
+        if newMode != 0 and newMode < self.mode:
+            print("WARNING: When going to a lower sampling rate, sensor should be set to idle for at least 10 minutes")
+            print("WARNING: Setting new mode to 0")
+            newMode = 0
         DRIVE_MODE = "{0:03b}".format(newMode)
         assert interrupt == 0 or interrupt == 1, print(f"INVALID INTERRUPT: {interrupt} (Please use 0 or 1 to disable / enable interrupt)")
         INT_DATARDY = "{0:01b}".format(interrupt)
@@ -119,11 +130,17 @@ class SENSOR():
     def newData(self):
         return getBit(self.status, 3)
 
-    def getCO2(self):
-        co2 = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 2)
-        print(type(co2))
-        print(co2)
-        #return int.from_bytes(read_result.buf[0]+read_result.buf[1],’big’)
+    def getData(self):
+        data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+        co2 = data[0:2]
+        tvoc = data[2:4]
+        self.status = data[4]
+        return {"co2": int.from_bytes(bytes(co2), 'big', signed=False),
+                "tvoc": int.from_bytes(bytes(tvoc), 'big', signed=False),
+                "status": data[4],
+                "error": data[5],
+                "rawData": data[6:]}
+    
 
 
 
@@ -139,10 +156,17 @@ DEVICE_SET_SW_RESET = [0x11, 0xE5, 0x72, 0x8A]
 """
 
 def main():
+    lastMeasurement = time()
     bus = smbus2.SMBus(1)
     sensor = SENSOR(0x5A, SENSOR_REGISTERS(), bus) # Initialises sensor
-    if sensor.new_data:
-        sensor.getCO2()
+    while(1):
+        if sensor.newData():
+            if time() - lastMeasurement > 1:
+                res = sensor.getData()
+                lastMeasurement = time()
+                print(f'CO2 = {res["co2"]}ppm, TVOC = {res["tvoc"]}ppb')
+        else:
+            sensor.getStatus()
 
 
 if __name__ == "__main__":
