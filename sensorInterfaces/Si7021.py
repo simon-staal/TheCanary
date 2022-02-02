@@ -26,11 +26,11 @@ class TH_SENSOR():
         self.REGS = TH_COMMANDS()
         self.bus = bus
 
-    def __convertHumid(measurement):
+    def __convertHumid(self,measurement):
         result = (125*measurement/65536) -6
         return result
 
-    def __convertTemp(measurement):
+    def __convertTemp(self,measurement):
         result = (175.72*measurement)/65536 - 46.85
         return result
 
