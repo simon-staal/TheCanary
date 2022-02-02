@@ -26,10 +26,15 @@ class TH_SENSOR():
         self.REGS = TH_COMMANDS()
         self.bus = bus
 
+    def __convertHumid(self,measurement):
+        result = (125*measurement/65536) -6
+        return result
+
+    def __convertTemp(self,measurement):
+        result = (175.72*measurement)/65536 - 46.85
+        return result
+
     def getTemp(self):
-        def convertTemp(measurement):
-            result = (175.72*measurement)/65536 - 46.85
-            return result
         #send the measure temperature command
         meas_temp = smbus2.i2c_msg.write(0x40,[0xf3])
         self.bus.i2c_rdwr(meas_temp)
@@ -43,7 +48,7 @@ class TH_SENSOR():
 
         #convert the result to an int
         rd_temp = int.from_bytes(read_result.buf[0]+read_result.buf[1],"big")
-        return convertTemp(rd_temp)
+        return self.__convertTemp(rd_temp)
 
     def getHumid(self):
         def convertHumid(measurement):
@@ -57,15 +62,44 @@ class TH_SENSOR():
         #wait for measurement
         sleep(0.1)
 
-        #send the read temperature command and read two bytes of data
+        #send the read humidity command and read two bytes of data
         read_result = smbus2.i2c_msg.read(0x40,2)
         self.bus.i2c_rdwr(read_result)
 
         #convert the result to an int
         rdHumid = int.from_bytes(read_result.buf[0]+read_result.buf[1],"big")
-        Humidity = convertHumid(rdHumid)
+        Humidity = self.__convertHumid(rdHumid)
         return Humidity
 
+    def getTH(self):
+        #send the measure Humidity command
+        measHumid = smbus2.i2c_msg.write(0x40,[0xf5])
+        self.bus.i2c_rdwr(measHumid)
+
+        #wait for measurement
+        sleep(0.1)
+
+        #send the read humidity command and read two bytes of data
+        read_result = smbus2.i2c_msg.read(0x40,2)
+        self.bus.i2c_rdwr(read_result)
+
+        #convert the result to an int
+        rdHumid = int.from_bytes(read_result.buf[0]+read_result.buf[1],"big")
+        Humidity = self.__convertHumid(rdHumid)
+
+        #send the read temperature command
+        getTemp = smbus2.i2c_msg.write(0x40,[self.CMND.RDTEMP])
+        self.bus.i2c_rdwr(getTemp)
+
+        #send the read temperature command and read twobytes of data
+        read_result = smbus2.i2c_msg.read(0x40,2)
+        self.bus.i2c_rdwr(read_result)
+
+        #convert the result to an int
+        rdTemp = int.from_bytes(read_result.buf[0]+read_result.buf[1],"big")
+        Temperature = self.__convertTemp(rdTemp)
+
+        return (Temperature,Humidity)
 
 """ Deal with these commands later
 Measure Relative Humidity, Hold Master Mode         0xE5
@@ -89,6 +123,7 @@ def main():
     
     print(sensor.getTemp())
     print(sensor.getHumid())
+    print(sensor.getTH())
 
 
 if __name__ == "__main__":
