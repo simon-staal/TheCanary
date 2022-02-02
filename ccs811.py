@@ -30,7 +30,7 @@ class SENSOR():
         self.REGS = regs
         self.bus = bus
         self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
-        self.print_status()
+        self.printStatus()
 
     def updateStatus(self, bus):
         self.status = bus.read_byte_data(self.ADDR, self.REGS.STATUS)
