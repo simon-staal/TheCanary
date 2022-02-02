@@ -25,13 +25,14 @@ class SENSOR_REGISTERS():
 
     # Used to launch application
     APP_START = 0xF4 # W
+
 # Sensor class
 class SENSOR():
     # Sensor parameters, change depending on your sensor
     ADDR = 0x5A # Can be 0x5B, check I2C connection
     REGS = SENSOR_REGISTERS()
 
-    def __init__(self, addr, regs, bus):
+    def __init__(self, bus, addr=0x5A, regs=SENSOR_REGISTERS()):
         self.ADDR = addr
         self.REGS = regs
         self.bus = bus
@@ -116,7 +117,7 @@ class SENSOR():
 
     def setMode(self, newMode=1, interrupt=0):
         assert newMode >= 0 and newMode <= 4, print(f"INVALID MODE: {newMode} (Please use a mode in the range [0-4])")
-        if newMode != 0 and newMode < self.mode:
+        if newMode != 0 and newMode != 4 and newMode > self.mode:
             print("WARNING: When going to a lower sampling rate, sensor should be set to idle for at least 10 minutes")
             print("WARNING: Setting new mode to 0")
             newMode = 0
@@ -140,7 +141,25 @@ class SENSOR():
                 "status": data[4],
                 "error": data[5],
                 "rawData": data[6:]}
-    
+
+    def setEnv(self, env):
+        # Packet we will send
+        newEnv = [0, 0, 0, 0]
+
+        # Convert humidity as per data-sheet
+        humidity = env["humidity"]
+        humidity = int(humidity * (2 << 8)) # Need to multiply because humidity is a float (cringe -- insert fastsqrt hack here)
+        newEnv[1] = humidity & 0xFF
+        newEnv[0] = (humidity >> 8) & 0xFF
+
+        # Convert temperature as per data-sheet
+        temp = env["temp"] - 25
+        temp = int(temp * (2 << 8))
+        newEnv[3] = temp & 0xFF
+        newEnv[2] = (temp >> 8) & 0xFF
+
+        self.bus.write_i2c_block_data(self.ADDR, self.REGS.ENV_DATA, newEnv)
+
 
 
 
@@ -158,7 +177,7 @@ DEVICE_SET_SW_RESET = [0x11, 0xE5, 0x72, 0x8A]
 def main():
     lastMeasurement = time()
     bus = smbus2.SMBus(1)
-    sensor = SENSOR(0x5A, SENSOR_REGISTERS(), bus) # Initialises sensor
+    sensor = SENSOR(bus) # Initialises sensor
     while(1):
         if sensor.newData():
             if time() - lastMeasurement > 1:
