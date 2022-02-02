@@ -1,4 +1,5 @@
 import smbus2
+from time import sleep
 
 # Helper function to isolate a bit of a given byte
 def getBit(val, idx):
@@ -7,7 +8,7 @@ def getBit(val, idx):
 # Slave register addresses
 class SENSOR_REGISTERS():
     STATUS = 0x00 # R
-    MODE = 0x01 # R/W
+    MEAS_MODE = 0x01 # R/W
 
     # The most signifcant 2 bytes contain a ppm estimate of eCO2 level, next 2 bytes contain a ppg estimate of the total VOC level
     ALG_RESULT_DATA = 0x02 # R
@@ -18,38 +19,27 @@ class SENSOR_REGISTERS():
     # Error source location
     ERROR_ID = 0xE0 # R
 
-    # Used to launch application
-    APP_START = 0xF4 # W
 # Sensor class
 class SENSOR():
     # Sensor parameters, change depending on your sensor
     ADDR = 0x5A # Can be 0x5B, check I2C connection
     REGS = SENSOR_REGISTERS()
 
-    def __init__(self, bus, addr=0x5A, regs=SENSOR_REGISTERS()):
+    def __init__(self, addr, regs, bus):
         self.ADDR = addr
         self.REGS = regs
         self.bus = bus
         self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
-        self.mode = self.bus.read_byte_data(self.ADDR, self.REGS.MODE)
-        self.printStatus()
+        self.print_status()
 
     def updateStatus(self, bus):
         self.status = bus.read_byte_data(self.ADDR, self.REGS.STATUS)
 
-    def startApp(self):
-        self.bus.write_i2c_block_data(self.ADDR, self.REGS.APP_START, [])
-    
     def printStatus(self):
         status = self.status
         FW_MODE = getBit(status, 7)
         print(f'FW_MODE: {FW_MODE}')
-        if FW_MODE == 0: 
-            print("Sensor is in boot mode")
-            print("Starting application")
-            self.startApp()
-            print("Please get new status")
-            return
+        assert FW_MODE == 1, "ERROR: Sensor is in boot mode"
         APP_VALID = getBit(status, 4)
         print(f'APP_VALID: {APP_VALID}')
         assert APP_VALID == 1, "ERROR: Sensor does not have valid application firmware"
@@ -82,6 +72,12 @@ DEVICE_SET_MODE_10S = [0x10]
 DEVICE_SET_SW_RESET = [0x11, 0xE5, 0x72, 0x8A]
 """
 
-bus = smbus2.SMBus(1)
-sensor = SENSOR(bus)
+def main():
+    bus = smbus2.SMBus(1)
+    sensor = SENSOR(0x5A, SENSOR_REGISTERS(), bus) # Initialises sensor
+    if sensor.new_data:
+        sensor.getCO2()
 
+
+if __name__ == "__main__":
+    main()
