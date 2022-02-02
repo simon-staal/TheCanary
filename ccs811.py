@@ -39,9 +39,10 @@ class SENSOR():
         self.printStatus()
         self.printMode()
 
-    def updateStatus(self, bus):
-        self.status = bus.read_byte_data(self.ADDR, self.REGS.STATUS)
+    def getStatus(self):
+        self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
         self.printStatus()
+        return self.status
 
     def startApp(self):
         self.bus.write_i2c_block_data(self.ADDR, self.REGS.APP_START, [])
@@ -58,7 +59,7 @@ class SENSOR():
             self.startApp()
             sleep(0.3)
             print("Getting new status...")
-            self.updateStatus()
+            self.getStatus()
             return
         
         # Check app is valid
@@ -74,9 +75,10 @@ class SENSOR():
         if DATA_READY == 1: print('Data is ready to be read')
         if ERROR == 1: print('Read ERROR_ID')
 
-    def updateMode(self):
+    def getMode(self):
         self.mode = self.bus.read_byte_data(self.ADDR, self.REGS.MODE)
         self.printMode()
+        return self.mode
 
     def printMode(self):
         mode = self.mode
@@ -87,7 +89,7 @@ class SENSOR():
             self.setMode()
             sleep(0.3)
             print("Getting new mode...")
-            self.updateMode()
+            self.getMode()
             return
         elif DRIVE_MODE == "001": print("Mode 1 - Constant power mode, IAQ measurement every second")
         elif DRIVE_MODE == "010": print("Mode 2 - Pulse heating mode IAQ measurement every 10 seconds")
