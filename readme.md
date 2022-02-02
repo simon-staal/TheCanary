@@ -31,3 +31,7 @@ Guide: https://www.avimesa.com/docs/dev-kits/kit-5-air-quality-using-a-raspberry
 Adafruit MPRLS Air Pressure Sensor
 -------------------------
 Company Website: https://www.adafruit.com/product/3965
+
+Si7021-A20 HUMIDITY AND TEMPERATURE SENSOR
+-------------------------
+DataSheet: https://cdn-learn.adafruit.com/assets/assets/000/035/931/original/Support_Documents_TechnicalDocs_Si7021-A20.pdf
