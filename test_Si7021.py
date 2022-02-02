@@ -48,5 +48,6 @@ def getHumid(bus):
     rdHumid = int.from_bytes(read_result.buf[0]+read_result.buf[1],"big")
     Humidity = convertHumid(rdHumid)
     return Humidity
+    
 print(getTemp(bus))
 print(getHumid(bus))
