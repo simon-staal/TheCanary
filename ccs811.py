@@ -1,6 +1,9 @@
-from asyncio.windows_events import NULL
 import smbus2
 from time import sleep
+
+# Helper function to isolate a bit of a given byte
+def getBit(val, idx):
+    return (val & (1 << idx)) >> idx
 
 # Slave register addresses
 class SENSOR_REGISTERS():
@@ -16,18 +19,23 @@ class SENSOR_REGISTERS():
     # Error source location
     ERROR_ID = 0xE0 # R
 
+# Sensor class
 class SENSOR():
+    # Sensor parameters, change depending on your sensor
     ADDR = 0x5A # Can be 0x5B, check I2C connection
     REGS = SENSOR_REGISTERS()
 
-    def __init__(self, bus):
+    def __init__(self, addr, regs, bus):
+        self.ADDR = addr
+        self.REGS = regs
         self.bus = bus
         self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
+        self.print_status()
 
     def updateStatus(self, bus):
         self.status = bus.read_byte_data(self.ADDR, self.REGS.STATUS)
 
-    def print_status(self):
+    def printStatus(self):
         status = self.status
         FW_MODE = getBit(status, 7)
         print(f'FW_MODE: {FW_MODE}')
@@ -42,12 +50,16 @@ class SENSOR():
         if DATA_READY == 1: print('Data is ready to be read')
         if ERROR == 1: print('Read ERROR_ID')
 
+    def newData(self):
+        return getBit(self.status, 3)
 
-def getBit(val, idx):
-    return (val & (1 << idx)) >> idx
+    def getCO2(self):
+        co2 = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 2)
+        print(type(co2))
+        print(co2)
+        #return int.from_bytes(read_result.buf[0]+read_result.buf[1],’big’)
 
-def new_data(status):
-    getBit(status, 3)
+
 
 """ Deal with these values later
 # Slave register read values
@@ -60,11 +72,12 @@ DEVICE_SET_MODE_10S = [0x10]
 DEVICE_SET_SW_RESET = [0x11, 0xE5, 0x72, 0x8A]
 """
 
-# Run this function
-def startup(bus, device):
-    status = bus.read_byte_data(device.ADDR, device.REGS.STATUS)
-    device.print_status(status)
+def main():
+    bus = smbus2.SMBus(1)
+    sensor = SENSOR(0x5A, SENSOR_REGISTERS(), bus) # Initialises sensor
+    if sensor.new_data:
+        sensor.getCO2()
 
-# I2C Bus
-bus = smbus2.SMBus(1)
-sensor = SENSOR(bus)
+
+if __name__ == "__main__":
+    main()
