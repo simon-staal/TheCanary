@@ -10,6 +10,15 @@ Pi Setup
 $ sudo apt update
 $ sudo apt install git
 ```
+- Add an ssh key for your raspberry pi as follows:
+  ```
+  $ ssh-keygen -t ed25519 -C "<your_github_email>"
+  // Press enter through all the prompts
+  $ cat ~/.ssh/id_ed25519.pub 
+  ```
+  Copy the output to your clipboard and paste it into the relevant field to add a new key here.
+
+  You should now be able to clone the repo onto your raspberry pi
 
 CCS811 Air Quality Sensor
 -------------------------
