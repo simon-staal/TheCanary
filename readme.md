@@ -28,6 +28,6 @@ Wiring: https://blog.adafruit.com/2017/08/14/updated-guide-adafruit-ccs811-air-q
 
 Guide: https://www.avimesa.com/docs/dev-kits/kit-5-air-quality-using-a-raspberry-pi/
 
-BMP280 Pressure Sensor
+Adafruit MPRLS Air Pressure Sensor
 -------------------------
-Company Website: https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/
+Company Website: https://www.adafruit.com/product/3965
