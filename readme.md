@@ -6,10 +6,10 @@ Pi Setup
 --------
 - Follow [**setup lab instructions**](lab-instructions-cw1-part1.pdf), you can skip the part about researching the sensor, make sure I2C / python is installed
 - Install git:
-```
-$ sudo apt update
-$ sudo apt install git
-```
+  ```
+  $ sudo apt update
+  $ sudo apt install git
+  ```
 - Add an ssh key for your raspberry pi as follows:
   ```
   $ ssh-keygen -t ed25519 -C "<your_github_email>"
