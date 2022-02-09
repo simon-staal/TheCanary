@@ -1,6 +1,7 @@
 import smbus2
 from time import sleep
 
+
 # only 1 register 32 bit wide
 #
 # Write
@@ -17,15 +18,26 @@ class MPRLS():
     def __init__(self, addr, bus):
         self.ADDR = addr
         self.bus = bus
-        self.readReq = [0x18, 0xAA, 0x00, 0x00]
+        self.readCmd = bytearray(4)
+
+    def readReq(self):
+        self.readCmd[0] = 0xAA
+        self.readCmd[1] = 0
+        self.readCmd[2] = 0
+        
+        msg = smbus2.i2c_msg.write(self.ADDR, self.readCmd)
+        self.bus.i2c_rdwr(msg)
+
+
 
     def getPressure(self):
-        self.bus.write_i2c_block_data(self.ADDR, 0, self.readReq)
+        self.readReq()
         sleep(0.005)
-        status = self.bus.read_i2c_block_data(self.ADDR, 3, 1)
-        pressure = self.bus.read_i2c_block_data(self.ADDR, 0, 3)
-        print("Current Status : " ,status)
-        print("Pressure Reading : ", pressure)
+        msg = smbus2.i2c_msg.read(self.ADDR, 4)
+        read = self.bus.i2c_rdwr(msg)
+        print(read)
+        #print("Current Status : " ,status)
+        #print("Pressure Reading : ", pressure)
 
 
 def main():
