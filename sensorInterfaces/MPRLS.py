@@ -22,11 +22,11 @@ class MPRLS():
         self.out = bytearray(4)
 
     def readReq(self):
-        self.readCmd[0] = 0xAA
-        self.readCmd[1] = 0
+        self.readCmd[0] = 0x18
+        self.readCmd[1] = 0xAA
         self.readCmd[2] = 0
-        for i in range(3):
-            self.bus.write_byte_data(self.ADDR, self.readCmd[i])
+        self.readCmd[3] = 0
+        self.bus.write_i2c_block_data(self.ADDR, 0, self.readCmd)
 
         #msg = smbus2.i2c_msg.write(self.ADDR, self.readCmd)
         #self.bus.i2c_rdwr(msg)
@@ -35,12 +35,9 @@ class MPRLS():
 
     def getPressure(self):
         self.readReq()
-        sleep(0.005)
-        #msg = smbus2.i2c_msg.read(self.ADDR, 4)
-        #read = self.bus.i2c_rdwr(msg)
-        for i in range(4):
-            self.out[i] = self.bus.read_byte_data(self.ADDR,0) 
-        print(self.out)
+        sleep(0.01)       
+        print(self.bus.read_i2c_block_data(self.ADDR, 0, 4))
+
         #print("Current Status : " ,status)
         #print("Pressure Reading : ", pressure)
 
@@ -49,8 +46,9 @@ def main():
     bus = smbus2.SMBus(2)
     sensor = MPRLS(0x18, bus) # Initialises sensor
     while(1):
+        sleep(2)
         sensor.getPressure()
-        sleep(4)
+        sleep(2)
 
 
 
