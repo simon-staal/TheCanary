@@ -39,7 +39,7 @@ Adafruit MPRLS Air Pressure Sensor
 -------------------------
 Company Website: https://www.adafruit.com/product/3965
 API: https://docs.circuitpython.org/projects/mprls/en/latest/ , https://github.com/adafruit/Adafruit_CircuitPython_MPRLS
-
+DataSheet: https://prod-edam.honeywell.com/content/dam/honeywell-edam/sps/siot/en-us/products/sensors/pressure-sensors/board-mount-pressure-sensors/micropressure-mpr-series/documents/sps-siot-mpr-series-datasheet-32332628-ciid-172626.pdf?download=false
 
 Si7021-A20 HUMIDITY AND TEMPERATURE SENSOR
 -------------------------
