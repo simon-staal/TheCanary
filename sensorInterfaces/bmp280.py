@@ -82,6 +82,8 @@ class SENSOR():
     def _read_compensation(self):
         coeff = self._read_register(self._regs.compensation, 24)
         coeff = struct.unpack("<HhhHhhhhhhhh", bytes(coeff))
+        coeff = [float(i) for i in coeff]
+        
 
     @property
     def _ctrl_meas(self):
