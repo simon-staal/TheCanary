@@ -287,9 +287,11 @@ class Sensor():
         ret = 0.0
         vals = self._read_register(register, 3)
         vals[2] = vals[2] >> 4
-        for b in vals:
+        for b in vals[:2]:
             ret *= 256.0
             ret += float(b & 0xFF)
+        ret *= 16.0
+        ret += float(vals[2] & 0xFF)
         return ret
 
     def _read_t_fine(self):
@@ -314,6 +316,7 @@ def getBit(val, idx):
 def main():
     bus = smbus2.SMBus(1)
     sensor = Sensor(bus)
+    sensor.mode = NORMAL_MODE
     lastMeasurement = time()
     sensor.standby_period = STANDBY_500 # Reduce sampling period
     while(1):
