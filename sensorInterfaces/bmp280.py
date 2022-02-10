@@ -218,11 +218,13 @@ class Sensor():
         
         return pressure / 100
 
-    """Altitude based on sea level pressure, update sea_level_pressure as needed. No clue if this will be reliable underground XD -- i'm sure it is"""
+    """Altitude based on sea level pressure using Hypsometric formula, update sea_level_pressure as needed. No clue if this will be reliable underground XD -- i'm sure it is"""
     @property
     def altitude(self):
+        t = self.temperature
         p = self.pressure
-        return 44330 * (1.0 - math.pow(p / self.sea_level_pressure, 0.1903))
+        h = ((math.pow(self.sea_level_pressure / p, 1/5.257) - 1) * (t + 273.15)) / 0.0065
+        return h
 
     """ PRIVATE STUFF -- NO TOUCHY >:( """
     def _read_byte(self, register):
