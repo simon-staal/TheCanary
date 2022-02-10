@@ -1,6 +1,7 @@
 import smbus2
 import struct
 from time import sleep
+from time import time
 import math
 
 """
@@ -32,14 +33,14 @@ OVERSAMPLE_X16 = 0x05
 _OVERSAMPLE = (DISABLED, OVERSAMPLE_X1, OVERSAMPLE_X2, OVERSAMPLE_X4, OVERSAMPLE_X8, OVERSAMPLE_X16)
 
 # Standby time values (in ms), defines how often measurements are taken in normal mode (kinda, see datasheet)
-STANDBY_0_5 = 0
-STANDBY_62_5 = 0x1
-STANDBY_125 = 0x2
-STANDBY_250 = 0x3
-STANDBY_500 = 0x4
-STANDBY_1000 = 0x5
-STANDBY_2000 = 0x6
-STANDBY_4000 = 0x7
+STANDBY_0_5 = 0 # Corresponds to 26.32Hz for default resolution
+STANDBY_62_5 = 0x1 # 10Hz for default resolution
+STANDBY_125 = 0x2 # 6.15 Hz for default resolution
+STANDBY_250 = 0x3 # 3.48Hz for default resolution
+STANDBY_500 = 0x4 # 1.86Hz for default resolution
+STANDBY_1000 = 0x5 # 0.96Hz for default resolution
+STANDBY_2000 = 0x6 # 0.49Hz for default resolution
+STANDBY_4000 = 0x7 # 0.25Hz for default resolution
 
 _STANDBY = (STANDBY_0_5, STANDBY_62_5, STANDBY_125, STANDBY_250, STANDBY_500, STANDBY_1000, STANDBY_2000, STANDBY_4000)
 
@@ -81,9 +82,7 @@ class SENSOR_REGISTERS():
 
 """
 Anything marked by @property can be accessed like a member variable.
-e.g.
-bus = smbus2.SMBus(1)
-sensor = SENSOR(bus)
+See main() for example use
 
 temp = sensor.temperature // Gets temperature from sensor
 sensor.mode = SLEEP_MODE // Sets mode to SLEEP
@@ -94,7 +93,7 @@ The rate at which measurements can be performed depends on the mode / oversampli
 
 Using default initialisation values, can read every 100ms (should be fast enough)
 """
-class SENSOR():
+class Sensor():
     def __init__(self, bus):
         self._addr = 0x77
         self._regs = SENSOR_REGISTERS()
@@ -133,13 +132,13 @@ class SENSOR():
         self._mode = value
         self._write_ctrl_meas()
 
-    """Controls sensor measurement standy period"""
+    """Controls sensor measurement sampling period"""
     @property
-    def standby(self):
+    def standby_period(self):
         return self._t_standby
 
-    @standby.setter
-    def standby(self, value):
+    @standby_period.setter
+    def standby_period(self, value):
         assert value in _STANDBY, print(f'ERROR: Invalid standby period {value}')
 
         if self._t_standby == value:
@@ -311,3 +310,18 @@ class SENSOR():
 # Helper function to isolate a bit of a given byte
 def getBit(val, idx):
     return (val & (1 << idx)) >> idx
+
+def main():
+    bus = smbus2.SMBus(1)
+    sensor = Sensor(bus)
+    lastMeasurement = time()
+    sensor.standby_period = STANDBY_500 # Reduce sampling period
+    while(1):
+        if time() - lastMeasurement > 1:
+            print(f'Temperature = {sensor.temperature}°C, Pressure = {sensor.pressure}hPa, Altitude = {sensor.altitude}m above sea level')
+    
+
+
+
+if __name__ == "__main__":
+    main()
