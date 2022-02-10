@@ -322,6 +322,7 @@ def main():
     while(1):
         if time() - lastMeasurement > 1:
             print(f'Temperature = {sensor.temperature}°C, Pressure = {sensor.pressure}hPa, Altitude = {sensor.altitude}m above sea level')
+            lastMeasurement = time()
     
 
 
