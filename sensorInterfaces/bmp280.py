@@ -106,7 +106,7 @@ class Sensor():
         self._t_standby = STANDBY_62_5
         self._iir_filter = IIR_X4
 
-        chip_id = self._read_byte(self.regs.id)
+        chip_id = self._read_byte(self._regs.id)
         assert chip_id == CHIP_ID, print(f'ERROR: Failed to find BPM280, Chip ID = {chip_id}')
 
         self._reset()
