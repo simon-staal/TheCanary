@@ -1,12 +1,59 @@
 import smbus2
 import struct
 from time import sleep
+import math
 
-# Helper function to isolate a bit of a given byte
-def getBit(val, idx):
-    return (val & (1 << idx)) >> idx
+"""
+Interface fo BMP280
+Datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP280-DS001-11.pdf
+"""
 
-# Slave register addresses
+""" Parameter options, use these to update the value of relevant parameters"""
+CHIP_ID = 0x58
+RESET = 0xB6
+
+# Mode values
+SLEEP_MODE = 0 # I sleep
+FORCE_MODE = 0x01 # Real shit? (allows us to force a measurement, returns to sleep after)
+NORMAL_MODE = 0x03 # Takes measurements regularly
+
+_MODES = (SLEEP_MODE, FORCE_MODE, NORMAL_MODE) # Enum, used for value checking
+
+# Oversampling values (for both temperature and pressure), higher values -> increase resolution + reduce noise
+# Increases power consumption (obv)
+# It is recommended to set the temperature oversampling to x2 (or less if pressure is sampled less)
+DISABLED = 0 # Skips measurement
+OVERSAMPLE_X1 = 0x01
+OVERSAMPLE_X2 = 0x02
+OVERSAMPLE_X4 = 0x03
+OVERSAMPLE_X8 = 0x04
+OVERSAMPLE_X16 = 0x05
+
+_OVERSAMPLE = (DISABLED, OVERSAMPLE_X1, OVERSAMPLE_X2, OVERSAMPLE_X4, OVERSAMPLE_X8, OVERSAMPLE_X16)
+
+# Standby time values (in ms), defines how often measurements are taken in normal mode (kinda, see datasheet)
+STANDBY_0_5 = 0
+STANDBY_62_5 = 0x1
+STANDBY_125 = 0x2
+STANDBY_250 = 0x3
+STANDBY_500 = 0x4
+STANDBY_1000 = 0x5
+STANDBY_2000 = 0x6
+STANDBY_4000 = 0x7
+
+_STANDBY = (STANDBY_0_5, STANDBY_62_5, STANDBY_125, STANDBY_250, STANDBY_500, STANDBY_1000, STANDBY_2000, STANDBY_4000)
+
+# iir filter values, used to suppress disturbances in output data 
+IIR_DISABLE = 0
+IIR_X2 = 0x01
+IIR_X4 = 0x02
+IIR_X8 = 0x03
+IIR_X16 = 0x04
+
+_IIR_FILTER = (IIR_DISABLE, IIR_X2, IIR_X4, IIR_X8, IIR_X16)
+
+
+"""Slave register addresses - ignore this"""
 class SENSOR_REGISTERS():
     # Contains chip identification number == 0x58. Can be read as soon as device finished power-on-reset
     id = 0xD0 # R
@@ -32,49 +79,6 @@ class SENSOR_REGISTERS():
     # 24 bytes, contains compensation parameters to calibrate temperature and pressure readings
     compensation = 0x88
 
-CHIP_ID = 0x58
-RESET = 0xB6
-
-# Mode values
-SLEEP_MODE = 0
-FORCE_MODE = 0x01
-NORMAL_MODE = 0x03
-
-_MODES = (SLEEP_MODE, FORCE_MODE, NORMAL_MODE) # Enum, used for value checking
-
-# Oversampling values, higher values -> increase resolution + reduce noise
-# It is recommended to set the temperature oversampling to x2 (or less if pressure is sampled less)
-DISABLED = 0 # Skips measurement
-OVERSAMPLE_X1 = 0x01
-OVERSAMPLE_X2 = 0x02
-OVERSAMPLE_X4 = 0x03
-OVERSAMPLE_X8 = 0x04
-OVERSAMPLE_X16 = 0x05
-
-_OVERSAMPLE = (DISABLED, OVERSAMPLE_X1, OVERSAMPLE_X2, OVERSAMPLE_X4, OVERSAMPLE_X8, OVERSAMPLE_X16)
-
-# Standby time values (in ms), defines how often measurements are taken in normal mode
-STANDBY_0_5 = 0
-STANDBY_62_5 = 0x1
-STANDBY_125 = 0x2
-STANDBY_250 = 0x3
-STANDBY_500 = 0x4
-STANDBY_1000 = 0x5
-STANDBY_2000 = 0x6
-STANDBY_4000 = 0x7
-
-_STANDBY = (STANDBY_0_5, STANDBY_62_5, STANDBY_125, STANDBY_250, STANDBY_500, STANDBY_1000, STANDBY_2000, STANDBY_4000)
-
-# iir filter values
-IIR_DISABLE = 0
-IIR_X2 = 0x01
-IIR_X4 = 0x02
-IIR_X8 = 0x03
-IIR_X16 = 0x04
-
-_IIR_FILTER = (IIR_DISABLE, IIR_X2, IIR_X4, IIR_X8, IIR_X16)
-
-
 """
 Anything marked by @property can be accessed like a member variable.
 e.g.
@@ -85,6 +89,10 @@ temp = sensor.temperature // Gets temperature from sensor
 sensor.mode = SLEEP_MODE // Sets mode to SLEEP
 
 Everything is managed internally, any variable prefixed with an '_' is private and should not be touched.
+
+The rate at which measurements can be performed depends on the mode / oversampling parameters. Refer to 3.8.1 and 3.8.2 of the datasheet
+
+Using default initialisation values, can read every 100ms (should be fast enough)
 """
 class SENSOR():
     def __init__(self, bus):
@@ -108,9 +116,12 @@ class SENSOR():
         self._write_config()
 
         self._t_fine = None
+        self.sea_level_pressure = 1013.25 # Pressure in hPa at sea level
 
 
-    """ PUBLIC STUFF """
+    """ PUBLIC STUFF -- USE THIS"""
+
+    """Controls sensor mode, valid values are listed above in constants"""
     @property
     def mode(self):
         return self._mode
@@ -122,6 +133,7 @@ class SENSOR():
         self._mode = value
         self._write_ctrl_meas()
 
+    """Controls sensor measurement standy period"""
     @property
     def standby(self):
         return self._t_standby
@@ -136,6 +148,7 @@ class SENSOR():
         self._t_standby = value
         self._write_config()
 
+    """Controls sensor temperature oversampling coefficient"""
     @property
     def oversample_temperature(self):
         return self._oversample_temperature
@@ -147,6 +160,7 @@ class SENSOR():
         self._oversample_temperature = value
         self._write_ctrl_meas()
 
+    """Controls sensor pressure oversampling coefficient"""
     @property
     def oversample_pressure(self):
         return self._oversample_pressure
@@ -158,6 +172,7 @@ class SENSOR():
         self._oversample_pressure = value
         self._write_ctrl_meas()
 
+    """IIR filter coefficient, see constants"""
     @property
     def iir_filter(self):
         return self._iir_filter
@@ -175,11 +190,42 @@ class SENSOR():
         self._read_t_fine()
         return self._t_fine / 5120.0
 
+    """Compensated pressure in hectoPascals (hPa)"""
     @property
     def pressure(self):
-         
+        self._read_t_fine()
 
-    """ PRIVATE STUFF """
+        # Datasheet algorithm (that's why variable names suck)
+        # Also I have no idea what's going on here lol
+        # Made everything floats to make life simpler, if this tanks performance I'll re-implement using bit manip stuff
+        # Remeber that premature optimization is the root of all evil
+        adc = self._read20(self._regs.pressure)
+        var1 = self._t_fine / 2.0 - 64000.0
+        var2 = var1 ** 2 * self._pressure_comp[5] / 32768.0
+        var2 += var1 * self._pressure_comp[4] * 2.0
+        var2 = var2 / 4.0 + self._pressure_comp[3] * 65536.0
+        var3 = self._pressure_comp[2] * var1 ** 2 / 524288.0
+        var1 = (var3 + self._pressure_comp[1] * var1) / 524288.0
+        var1 = (1.0 + var1 / 32768.0) * self._pressure_comp[0]
+        
+        # Avoid divide by 0 error
+        assert var1, print("ERROR: Failed to calculate pressure, possible error while reading compensation registers")
+
+        pressure = 1048576.0 - adc
+        pressure = ((pressure - var2 / 4096.0) * 6250.0) / var1
+        var1 = self._pressure_comp[8] * pressure ** 2 / 2147483648.0
+        var2 = pressure * self._pressure_comp[7] / 32768.0
+        pressure += (var1 + var2 + self._pressure_comp[6]) / 16.0
+        
+        return pressure / 100
+
+    """Altitude based on sea level pressure, update sea_level_pressure as needed. No clue if this will be reliable underground XD -- i'm sure it is"""
+    @property
+    def altitude(self):
+        p = self.pressure
+        return 44330 * (1.0 - math.pow(p / self.sea_level_pressure, 0.1903))
+
+    """ PRIVATE STUFF -- NO TOUCHY >:( """
     def _read_byte(self, register):
         return self.bus.read_byte_data(self._addr, register)
 
@@ -261,3 +307,7 @@ class SENSOR():
             (raw_temperature / 131072.0 - self._temp_comp[0] / 8192.0) ** 2) * self._temp_comp[2]
 
         self._t_fine = var1 + var2
+
+# Helper function to isolate a bit of a given byte
+def getBit(val, idx):
+    return (val & (1 << idx)) >> idx
