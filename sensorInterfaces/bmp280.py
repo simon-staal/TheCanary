@@ -321,7 +321,7 @@ def main():
     sensor.standby_period = STANDBY_500 # Reduce sampling period
     while(1):
         if time() - lastMeasurement > 1:
-            print(f'Temperature = {sensor.temperature}°C, Pressure = {sensor.pressure}hPa, Altitude = {sensor.altitude}m above sea level')
+            print(f'Temperature = {sensor.temperature:.2f}°C, Pressure = {sensor.pressure:.2f}hPa, Altitude = {sensor.altitude:.2f}m above sea level')
             lastMeasurement = time()
     
 
