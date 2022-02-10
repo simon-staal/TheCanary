@@ -218,7 +218,7 @@ class Sensor():
         
         return pressure / 100
 
-    """Altitude based on sea level pressure using Hypsometric formula, update sea_level_pressure as needed. No clue if this will be reliable underground XD -- i'm sure it is"""
+    """Altitude based on sea level pressure using Hypsometric formula, update sea_level_pressure as needed. Doesn't seem to work super well in. No clue if this will be reliable underground XD -- i'm sure it is"""
     @property
     def altitude(self):
         t = self.temperature
