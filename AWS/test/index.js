@@ -23,7 +23,7 @@ client.on("connect", () => {
 		console.log('Subscribed to topic: ' + topic);
 	});
 	// Testing publishing ability
-	publish('test/test','hello from backend');
+	publish('test/test','Hello from backend (securely)');
 })
 
 // Runs if unable to connect to broker
@@ -37,6 +37,11 @@ client.on('message', (topic, message, packet) => {
         console.log(message.toString());
     }
 })
+
+const pubOptions={
+	retain:true,
+	qos:1
+};
 
 // You can call this function to publish to things
 function publish(topic,msg,options=pubOptions){
