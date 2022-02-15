@@ -47,6 +47,25 @@ print(f'Connect status: {mqtt.error_string(res)}')
 ```
 - Publishes were recieved by `mosquitto_sub` client on AWS instance
 
+*SSL on backend*
+- Created key and certification for the pi, and signed it with the CA key (identical to mosquitto)
+- Initialised mqtt client as follows (see [example](test/index.js)):
+```javascript
+const mqtt = require('mqtt')
+const fs = require('fs');
+
+const clientOptions = {
+    clientID: "mqttjs01",
+    username: "webapp",
+    password: "=ZCJ=4uzfZZZ#36f",
+
+    key: fs.readFileSync('../cert/webapp.key'),
+    cert: fs.readFileSync('../cert/webapp.crt'),
+    ca: [ fs.readFileSync('../cert/ca.crt') ]
+}
+
+var client = mqtt.connect('mqtts://thecanary.duckdns.org', clientOptions);
+```
 
 Topics
 -------
