@@ -24,12 +24,11 @@ nginx Web Server
 ----------------
 I set up an nginx web server on our AWS instance to allow us to use HTTPS on our website and forward connection requests to thecanary.duckdns.org to our REACT web app, giving us a proper domain name for browser clients to interact with our device.
 
+I obtained the domain name thecanary.duckdns.org for free using good old [**duckdns**](duckdns.org), and dynamically bound it to the AWS server's IP address using the following [**guide**](https://www.duckdns.org/install.jsp?tab=linux-cron&domain=thecanary). This means that even if our AWS server goes down or changes IP addresses, once it comes back online the will automatically update the IP address that our domain points to, making our system more realiable.
+
+I already had nginx installed from a previous project on this AWS instance. In order to update the configurations to point to our new domain name by changing the /etc/nginx/sites-enabled/default file, which has a copy included [**here**](nginx_default). This configuration automatically redirects any HTTP traffic to use HTTPS, and forwards these connections to our web-app frontend which runs on port 3000.
+
 To use HTTPS, I used the Certbot ACME client to add LetsEncrypt SSL certificates for our domain and install them into nginx as per their [**instructions**](https://certbot.eff.org/instructions?ws=nginx&os=ubuntubionic). I also uninstalled the certificates that were associated with a previous project using `sudo certbot delete`
 
-Additionally, set up the certificate to auto-renew every week as certificates are only valid for 3 months. This was done 
-
-Fixed HTTPS issues, so now have full front-to-back encryption!
-
-
-Dynamic DNS setup: https://www.duckdns.org/install.jsp?tab=linux-cron&domain=thecanary
+Additionally, set up the certificate to auto-renew every week as certificates are only valid for 3 months. This was done by adding the following `cron` job: `30 2 * * 1 /usr/bin/certbot renew >> /var/log/le-renew.log`, which renews the certificate every monday at 2:30am (UTC). The expiry date of a certificate can be checked with `sudo certbot cerfiticates`.
 
