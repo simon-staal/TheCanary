@@ -1,9 +1,11 @@
 const mqtt = require('mqtt')
+const fs = require('fs');
 
 const clientOptions = {
     clientID: "mqttjs01",
     username: "webapp",
-    rejectUnauthorized: false
+    password: "=ZCJ=4uzfZZZ#36f",
+    ca: [ fs.readFileSync('../cert/ca.crt') ]
 }
 
 var client = mqtt.connect('mqtts://thecanary.duckdns.org', clientOptions);
@@ -26,7 +28,7 @@ client.on("connect", () => {
 
 // Runs if unable to connect to broker
 client.on("error", error => {
-	console.log("cannot connect " + error);
+	console.log("Cannot connect " + error);
 	process.kill(process.pid, 'SIGTERM');
 });
 
