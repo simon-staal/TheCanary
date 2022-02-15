@@ -17,14 +17,11 @@ class MPRLS():
     def __init__(self, addr, bus):
         self.ADDR = addr
         self.bus = bus
-        self.readCmd = bytearray([0x30,0xAA, 0, 0])
+        self.readCmd = bytearray([0xAA, 0, 0])
 
     def takeReading(self):
-
-        print(byte(0x31))
-        for i in range(4):
-            print(self.readCmd[i])
-            self.bus.write_byte_data(0x18, 0, self.readCmd[i])
+        makeReading = smbus2.i2c_msg.write(0x18, self.readCmd)
+        self.bus.i2c_rdwr(makeReading)
 
     def readMeasurement(self):
         read = smbus2.i2c_msg.read(0x18, 4)
@@ -33,7 +30,7 @@ class MPRLS():
 
     def getPressure(self):
         self.takeReading()
-        sleep(0.001)
+        sleep(0.005)
         tmp = self.readMeasurement()
         print("read data: ", tmp)    
 

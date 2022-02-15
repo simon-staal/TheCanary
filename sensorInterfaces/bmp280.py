@@ -198,6 +198,7 @@ class Sensor():
         # Also I have no idea what's going on here lol
         # Made everything floats to make life simpler, if this tanks performance I'll re-implement using bit manip stuff
         # Remeber that premature optimization is the root of all evil
+        # ^Tell that to the HFTs >_<
         adc = self._read20(self._regs.pressure)
         var1 = self._t_fine / 2.0 - 64000.0
         var2 = var1 ** 2 * self._pressure_comp[5] / 32768.0

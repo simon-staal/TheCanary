@@ -141,6 +141,11 @@ class SENSOR():
                 "status": data[4],
                 "error": data[5],
                 "rawData": data[6:]}
+    
+    def getco2(self):
+        data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+        co2 = data[0:2]
+        return int.from_bytes(bytes(co2), 'big', signed=False)
 
     def setEnv(self, env):
         # Packet we will send

@@ -12,6 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import BasicSelect from './samplingSettings';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -36,7 +37,7 @@ const ResponsiveAppBar = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar style = {{background: '#434341'}} position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -131,6 +132,9 @@ const ResponsiveAppBar = () => {
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
+                <MenuItem key="1">
+                  <BasicSelect/>
+                </MenuItem>
             </Menu>
           </Box>
         </Toolbar>
