@@ -31,11 +31,28 @@ Updated broker to use encrypted communication on port 8883 with the outside worl
 Updated esp32 mqtt client to use encrypted port, untested (will test again at home)
 Refer to this: http://www.iotsharing.com/2017/08/how-to-use-esp32-mqtts-with-mqtts-mosquitto-broker-tls-ssl.html
 
+Topics
+-------
+The following functionality is required of our MQTT communication:
+- Sensor sends measurements
+- Webapp specifies sampling rate
+
+Therefore suggests the following topics:
+**sensor/instructions**
+Published to by web-app, subscribed to by ESP32
+- `sensor/instructions/sampling` sends new sampling frequency
+
+**sensor/data**
+Published to by ESP32, subscribed to by web-app
+- `sensor/data` contains sensor data
+
+We can therefore update the publishing rights to the topics to only allow the web-app / sensor to respectively publish to those topics. Additionally these topics can only be read from our web-app / sensor to prevent outside connections from accessing them
+
 <a name="users"></a>Users
 -------------------------
 I am making the following 2 users to limit access to the topics above (storing the users and passwords here cause plain text password storage is the one). I might keep them here permanently as security is more for the purposes of the assessment, it's not like anyone is actually gonna try and hijack our stuff. Obviously if I needed to be serious about security measures I wouldn't leave these here.
-- esp32:#8HAGxb3*V%+CD8^
-i.e. mosquitto_pub -h localhost -t "fromESP32/test" -m "<message>" -u "esp32" -P "#8HAGxb3*V%+CD8^"
+- sensor:2Q7!#fXb6zcaU*DY
+i.e. mosquitto_pub -h localhost -t "sensor/data" -m "<message>" -u "sensor" -P "2Q7!#fXb6zcaU*DY"
 - webapp:=ZCJ=4uzfZZZ#36f
 
-The rights of these users allows them to use **toESP32** and **fromESP32** as described above.
+These were added to the broker using [**this guide**](http://www.steves-internet-guide.com/mqtt-username-password-example/). The rights of these users were defined in the Access Control List (acl), and allows them to use **sensor/instructions** and **sensor/data** as described above.
