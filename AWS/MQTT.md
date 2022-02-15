@@ -14,13 +14,20 @@ Followed the following [guide](https://obrienlabs.net/how-to-setup-your-own-mqtt
 
 **SSL**
 SSL encryption for the broker was set up as follows:
-- I used a modified version of [**this**](https://github.com/owntracks/tools/blob/master/TLS/generate-CA.sh) script, where I specified the host to be the public IP address of the AWS instance. 
-- I moved the ca.crt and IP.* files to /etc/mosquitto/certs and updated the mosquitto config file.
-- Rebooted instance and tested as follows:
+- I first created my own certificate authority certificate key pair (giving the key a password): 
+    `$ openssl req -new -x509 -days 1095 -extensions v3_ca -keyout ca.key -out ca.crt`
+- I then generated a key and certificate for mosquitto:
 ```
-mosquitto_sub -t \# -v --cafile /etc/mosquitto/certs/ca.crt -p 8883
+$ openssl genrsa -out mosquitto.key 2048
+$ openssl req -out mosquitto.csr -key mosquitto.key -new
+```
+- And signed it with my CA key:
+`$ openssl x509 -req -in mosquitto.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out mosquitto.crt -days 1095`
+- I then moved the [CA certificate](cert/ca.crt) to /etc/mosquitto/ca_certificates, and the [mosquitto certificate]
+```
+mosquitto_sub -h thecanary.duckdns.org -p 8883 -t "test/#" --cafile ca.crt
      
-mosquitto_pub --cafile /etc/mosquitto/certs/ca.crt -h localhost -t "test/secure" -m "hello securely" -p 8883
+mosquitto_pub -h thecanary.duckdns.org -p 8883 -t "test/test" --cafile /etc/mosquitto/ca_certificates/ca.crt -m "<message>"
 ```
 - Then copied over the ca.crt file and used convert.cpp to put it into the mqtt_client.ino file for the esp32.
 - MQTT client now using WiFiClientSecure instead of just WifiClient, and certificate is used to connect to the broker securely.

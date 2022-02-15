@@ -29,3 +29,17 @@ client.on("error", error => {
 	console.log("cannot connect " + error);
 	process.kill(process.pid, 'SIGTERM');
 });
+
+client.on('message', (topic, message, packet) => {
+    if (topic === "test/test") {
+        console.log(message.toString());
+    }
+})
+
+// You can call this function to publish to things
+function publish(topic,msg,options=pubOptions){
+	console.log("publishing",msg);
+	if (client.connected == true){
+		client.publish(topic,msg,options);
+		}
+}
