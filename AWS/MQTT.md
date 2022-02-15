@@ -14,29 +14,39 @@ Followed the following [guide](https://obrienlabs.net/how-to-setup-your-own-mqtt
 
 **SSL**
 SSL encryption for the broker was set up as follows:
-- I first created my own certificate authority certificate key pair (giving the key a password): 
+- Created my own certificate authority certificate key pair (giving the key a password): 
     `$ openssl req -new -x509 -days 1095 -extensions v3_ca -keyout ca.key -out ca.crt`
-- I then generated a key and certificate for mosquitto:
+- Generated a key and certificate for mosquitto, and signed it with the CA key:
+  *N.B. When asked for 'common name', put in domain name (thecanary.duckdns.org)*
 ```
 $ openssl genrsa -out mosquitto.key 2048
 $ openssl req -out mosquitto.csr -key mosquitto.key -new
+$ openssl x509 -req -in mosquitto.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out mosquitto.crt -days 1095
 ```
-- And signed it with my CA key:
-`$ openssl x509 -req -in mosquitto.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out mosquitto.crt -days 1095`
-- I then moved the [CA certificate](cert/ca.crt) to /etc/mosquitto/ca_certificates, and the [mosquitto certificate]
+- Moved the [CA certificate](cert/ca.crt) to /etc/mosquitto/ca_certificates, and the [mosquitto certificate](cert/mosquitto.crt) and [key](cert/mosquitto.key) to /etc/mosquitto/certs.
+- Updated the mosquitto config file to use encrypted communication on port 8883 (and 9001 for websockets -- unused), see [**mosquitto_config**](mosquitto_config).
+
+
+After rebooting the instance, the MQTTS functionality was tested as follows:
 ```
 mosquitto_sub -h thecanary.duckdns.org -p 8883 -t "test/#" --cafile ca.crt
      
 mosquitto_pub -h thecanary.duckdns.org -p 8883 -t "test/test" --cafile /etc/mosquitto/ca_certificates/ca.crt -m "<message>"
 ```
-- Then copied over the ca.crt file and used convert.cpp to put it into the mqtt_client.ino file for the esp32.
-- MQTT client now using WiFiClientSecure instead of just WifiClient, and certificate is used to connect to the broker securely.
-- On the REST API side, used updated settings to connect to the broker, but since the connection is local, unencrypted communication can also be used.
 
-Updated broker to use encrypted communication on port 8883 with the outside world, only using port 1883 locally. MQTT client works with this.
+*SSL on pi*
+- Created a key and certificate for the pi, and signed it with the CA key (identical to mosquitto)
+- Set up the mqtt client as follows:
+```Python
+import paho.mqtt.client as mqtt
 
-Updated esp32 mqtt client to use encrypted port, untested (will test again at home)
-Refer to this: http://www.iotsharing.com/2017/08/how-to-use-esp32-mqtts-with-mqtts-mosquitto-broker-tls-ssl.html
+client = mqtt.Client()
+client.tls_set(ca_certs='AWS/cert/ca.crt', certfile='AWS/cert/pi.crt', keyfile='AWS/cert/pi.key')
+res = client.connect('thecanary.duckdns.org', port=8883)
+print(f'Connect status: {mqtt.error_string(res)}')
+```
+- Publishes were recieved by `mosquitto_sub` client on AWS instance
+
 
 Topics
 -------
