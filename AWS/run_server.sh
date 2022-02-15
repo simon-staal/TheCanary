@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-IP="3.8.182.14"
+IP="35.179.92.96"
 
 # if [[ $# -eq 0 ]] ; then
 #    >&2 echo "Usage: ./run_server.sh <IP>"
