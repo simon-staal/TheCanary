@@ -16,7 +16,7 @@ class TH_COMMANDS():
     
 
 # Temperature and Humidity Sensor
-class TH_SENSOR():
+class SENSOR():
     # Sensor parameters, change depending on your sensor
     ADDR = 0x40 
     CMND = TH_COMMANDS()
@@ -119,7 +119,7 @@ Read Firmware Revision 0x84                         0xB8
 
 def main():
     bus = smbus2.SMBus(1)
-    sensor = TH_SENSOR(bus) # Initialises sensor
+    sensor = SENSOR(bus) # Initialises sensor
     
     print(sensor.getTemp())
     print(sensor.getHumid())
