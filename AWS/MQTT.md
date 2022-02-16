@@ -42,6 +42,7 @@ import paho.mqtt.client as mqtt
 
 client = mqtt.Client()
 client.tls_set(ca_certs='AWS/cert/ca.crt', certfile='AWS/cert/pi.crt', keyfile='AWS/cert/pi.key')
+client.username_pw_set('sensor', '2Q7!#fXb6zcaU*DY')
 res = client.connect('thecanary.duckdns.org', port=8883)
 print(f'Connect status: {mqtt.error_string(res)}')
 ```
