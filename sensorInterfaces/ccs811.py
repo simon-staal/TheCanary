@@ -122,7 +122,7 @@ class SENSOR():
             print("WARNING: Setting new mode to 0")
             newMode = 0
         DRIVE_MODE = "{0:03b}".format(newMode)
-        assert interrupt == 0 or interrupt == 1, print(f"INVALID INTERRUPT: {interrupt} (Please use 0 or 1 to disable / enable interrupt)")
+        assert interrupt == 0 or interrupt == 1, print(f"ERROR: INVALID INTERRUPT: {interrupt} (Please use 0 or 1 to disable / enable interrupt)")
         INT_DATARDY = "{0:01b}".format(interrupt)
         data = bitStringToByte(f"0{DRIVE_MODE}{INT_DATARDY}000")
         self.bus.write_byte_data(self.ADDR, self.REGS.MODE, data)
@@ -190,3 +190,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
