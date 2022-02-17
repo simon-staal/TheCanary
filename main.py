@@ -10,6 +10,7 @@ import numpy as np
 import json
 
 
+
 #set up sensors - i2c connections + mqtt
 def initSensors():
     bus = smbus2.SMBus(1)
@@ -17,18 +18,25 @@ def initSensors():
     tempHumiditySensor = Si7021.SENSOR(bus)
     airPressureSensor = bmp280.Sensor(bus)
 
-    co2Data = Data(airQualitySensor, airQualitySensor.getco2())
-    tempData = Data(tempHumiditySensor, tempHumiditySensor.getTemp(), )
-    humidityData = Data(tempHumiditySensor, tempHumiditySensor.getHumid())
-    airPressureData = Data(airPressureSensor, airPressureSensor.pressure)
+    co2Data = Data.Data(airQualitySensor, airQualitySensor.getco2())
+    tempData = Data.Data(tempHumiditySensor, tempHumiditySensor.getTemp())
+    humidityData = Data.Data(tempHumiditySensor, tempHumiditySensor.getHumid())
+    airPressureData = Data.Data(airPressureSensor, airPressureSensor.pressure)
 
     for item in {co2Data, tempData, humidityData, airPressureData}:
         item.last20val = np.full_like(np.arange(6, dtype=float), item.getReading())
 
-    return airQualitySensor, tempHumiditySensor, airPressureSensor
+    return co2Data, tempData, humidityData, airPressureData
+
+def shutDown():
+    #might put other stuff here
+    print("Ending Program")
+    exit()
 
 def onMessage(client, userdata, message):
-    msg = json.loads(message)
+    msg = json.loads(message.payload.decode("utf-8"))
+    if(msg is "end"):## just placeholeder atm
+        shutDown()
     print("Received message:{} on topic {}".format(str(message.payload.decode("utf-8")), message.topic))
 
 def initMQTT(): 
@@ -51,15 +59,20 @@ def initMQTT():
 
     return client
 
-def shutDown():
-    #might put other stuff here
-    print("Ending Program")
-    exit()
+def sendInfo(msg, client):
+    MsgInfo = client.publish("sensor/",msg)
+    print("...")
+    print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
 
 def main():
     
-    airQuality, tempHumid, airPresssure = initSensors()
+    co2, temp, humidity, airPresssure = initSensors()
     client = initMQTT()
+    
+    while(1): # placeholder gonna figure out different sensor pollrates 
+        for i in {co2, temp, humidity, airPresssure}:
+            sendInfo(i.getData(), client)
+        time.sleep(i.pollRate())
 
 
     
