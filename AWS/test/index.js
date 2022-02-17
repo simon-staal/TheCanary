@@ -5,6 +5,9 @@ const clientOptions = {
     clientID: "mqttjs01",
     username: "webapp",
     password: "=ZCJ=4uzfZZZ#36f",
+
+    key: fs.readFileSync('../cert/webapp.key'),
+    cert: fs.readFileSync('../cert/webapp.crt'),
     ca: [ fs.readFileSync('../cert/ca.crt') ]
 }
 
