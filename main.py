@@ -7,6 +7,7 @@ import time
 import paho.mqtt.client as mqtt
 import DataProcessing as Data
 import numpy as np
+import json
 
 
 #set up sensors - i2c connections + mqtt
@@ -26,6 +27,10 @@ def initSensors():
 
     return airQualitySensor, tempHumiditySensor, airPressureSensor
 
+def onMessage(client, userdata, message):
+    msg = json.loads(message)
+    print("Received message:{} on topic {}".format(str(message.payload.decode("utf-8")), message.topic))
+
 def initMQTT(): 
     client = mqtt.Client()
     client.tls_set(ca_certs="mosquitto.org.crt",\
@@ -42,8 +47,14 @@ def initMQTT():
     # print("...")
     # print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
 
+    client.on_message = onMessage
+
     return client
 
+def shutDown():
+    #might put other stuff here
+    print("Ending Program")
+    exit()
 
 def main():
     
