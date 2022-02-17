@@ -9,20 +9,23 @@ RED = 2
 
 class Data():
 
-    def __init__(self,Sensor, dataFunc, val20, client):
-        self.last20Val = val20
-        self.sensor = Sensor
+    def __init__(self, sensorName, dataFunc):
+        self.last20Val
+        self.sensor = sensorName
         self.minVal = 1
         self.maxVal = 1
         self.pollingRate = 0.20
         self.defaultPollingRate = 0.20
         self.dangerLevel = GREEN #DFS would actually be useful here. levels could be green amber red
         self.dataFunc = dataFunc
-        self.client = client
+        #self.client = client
         self.lastReading
 
     def getReading(self):
         return self.dataFunc
+
+    def setDefaultPollingRate(self, pollRate):
+        self.defaultPollingRate = pollRate
 
     @property
     def avgVal(self):
@@ -31,6 +34,9 @@ class Data():
     @property
     def consistentBadValues(self):
         return self.avgVal > self.maxVal | self.avgVal < self.minVal
+
+    def pollRate(self):
+        return 1/self.pollingRate
 
     @property
     def worryingValue(self):
@@ -47,10 +53,10 @@ class Data():
         #this as a whole looks super inefficient refactor later 
         if(self.consistentBadValues):
             self.dangerLevel = RED
-            self.pollinRate = 6 # idk if i need this
+            self.pollinRate = self.defaultPollingRate * 8
         elif(self.worryingValue):
             self.dangerLevel = AMBER
-            self.pollingRate = 5
+            self.pollingRate = self.defaultPollingRate * 4
         else:
             self.dangerLevel = GREEN
             self.pollingRate = self.defaultPollingRate
@@ -58,5 +64,5 @@ class Data():
 
     def getData(self):
         self.processData()
-        return json.dumps({"Latest Reading":self.lastRead, "Average Value":self.avgVal, "Danger Level":self.dangerLevel})
+        return json.dumps({"Sensor":self.sensor, "Latest Reading":self.lastRead, "Average Value":self.avgVal, "Danger Level":self.dangerLevel})
 
