@@ -9,7 +9,7 @@ import Miner from './Miner.js'
 import { experimentalStyled as styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import axios from 'axios'
+
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -21,13 +21,11 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Miners(props) {
     return(
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: props.xs, sm: 8, md: 12 }}>
         {props.miners.map((miner, index) => (
             <Grid item xs={props.xs}  key={miner.id}>
-
-                <Miner id={miner.id} data={miner.data}/>
-
+                    <Miner id={miner.id} data={miner.data}/>
             </Grid>
         ))}
         </Grid>
