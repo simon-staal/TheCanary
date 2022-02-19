@@ -20,6 +20,12 @@ app.get("/miners", (req, res) => {
     res.send( miners);
   });
 
+app.get("/graph", (req, res) => {
+    const data = {y: [4,2,2,3,7,8,5], x: ["Jan", "Febr", "Mar", "Apr", "May", "June", "July"]};
+    res.send( data);
+    //get data from database
+});
+
 app.listen(PORT, () => {
     console.log("Browser server listening on " + PORT);
 });
@@ -29,6 +35,10 @@ app.use('/login', (req, res) => {
       token: 'test123'
     });
   });
+
+app.post('/freq', (req, res)=>{
+    res.send('OK');
+});
 
 
 

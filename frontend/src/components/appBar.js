@@ -13,9 +13,59 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import BasicSelect from './samplingSettings';
+import { styled , alpha} from '@mui/material/styles';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'right',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: 6,
+    marginTop: theme.spacing(1),
+    minWidth: 180,
+    color:
+      theme.palette.primary.main,
+    backgroundColor: theme.palette.backgroundLight.main,
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenu-list': {
+      padding: '4px 0',
+    },
+    
+    '& .MuiMenuItem-root': {
+      '& .MuiSvgIcon-root': {
+        fontSize: 18,
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(1.5),
+      },
+      '&:active': {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          theme.palette.action.selectedOpacity,
+        ),
+      },
+      /*
+      '& .MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper': {
+        backgroundColor: "black",
+
+      }
+      */
+    },
+  },
+}));
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -35,6 +85,7 @@ const ResponsiveAppBar = () => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
 
   return (
     <AppBar style = {{background: '#434341'}} position="static">
@@ -58,9 +109,10 @@ const ResponsiveAppBar = () => {
               onClick={handleOpenNavMenu}
               color="inherit"
             >
-              <MenuIcon />
+              <MenuIcon  color ="secondary"/>
             </IconButton>
-            <Menu
+            <Box sx={{ background: '#272A31',flexGrow: 0, display: { xs: 'none', md: 'flex' } }}>
+            <StyledMenu
               id="menu-appbar"
               anchorEl={anchorElNav}
               anchorOrigin={{
@@ -79,16 +131,20 @@ const ResponsiveAppBar = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+                <MenuItem key={page} onClick={handleCloseNavMenu} selected>
+                  <Typography textAlign="center">{page}  </Typography>
                 </MenuItem>
               ))}
-            </Menu>
+              
+              
+            </StyledMenu>
+            </Box>
           </Box>
           <Typography
             variant="h6"
             noWrap
             component="div"
+            color="white"
             sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
           >
             LOGO
@@ -111,8 +167,8 @@ const ResponsiveAppBar = () => {
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
+            <StyledMenu
+              sx={{ mt: '45px', color:"black" }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
@@ -132,10 +188,10 @@ const ResponsiveAppBar = () => {
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
-                <MenuItem key="1">
+                <MenuItem key="BasicSelect">
                   <BasicSelect/>
                 </MenuItem>
-            </Menu>
+            </StyledMenu>
           </Box>
         </Toolbar>
       </Container>

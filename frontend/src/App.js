@@ -8,14 +8,20 @@ import Login from './components/Login';
 import useToken from './components/useToken';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-const theme = createTheme({
+
+export const theme = createTheme({
   palette: {
     primary: {
       main: '#FEEE4D',
+      light: '#FEEE4D',
+      dark: '#FEEE4D',
     },
     secondary: {
       main: '#FFFAC8',
       background: '#313131',
+      light: '#FEEE4D',
+      dark: '#FEEE4D',
+
     },
     backgroundDark: {
       main: '#121212',
@@ -23,7 +29,17 @@ const theme = createTheme({
     backgroundLight: {
       main: '#313131',
     },
-  }
+  },
+  overrides: {
+    MuiMenuItem: {
+      root: {
+        '&$selected': {
+          backgroundColor: `#121212`,
+        },
+      },
+    },
+    
+  },
 });
 
 function App() {

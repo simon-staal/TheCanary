@@ -6,8 +6,9 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Modal from '@mui/material/Modal';
-import {ArgumentAxis, ValueAxis, Chart, LineSeries,} from '@devexpress/dx-react-chart-material-ui';
-import Paper from '@mui/material/Paper';
+import CustomChart  from './chart';
+
+
 
 const style = {
   position: 'absolute',
@@ -78,14 +79,7 @@ export default function Miner(props) {
                         {elem}
                     </Typography>)
           })}
-            <Paper>
-              <Chart data={data}>
-                <ArgumentAxis  />
-                <ValueAxis />
-
-                <LineSeries valueField="value" argumentField="argument" />
-              </Chart>
-            </Paper>
+          <CustomChart/>
         </Box>
       </Modal>
     </Card>

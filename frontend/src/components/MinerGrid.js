@@ -23,7 +23,7 @@ export default function Miners(props) {
     return(
         <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: props.xs, sm: 8, md: 12 }}>
-        {props.miners.map((miner, index) => (
+        {props.miners.map((miner) => (
             <Grid item xs={props.xs}  key={miner.id}>
                     <Miner id={miner.id} data={miner.data}/>
             </Grid>
