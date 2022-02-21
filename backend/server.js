@@ -139,7 +139,7 @@ var MQTTclient = mqtt.connect('mqtts://thecanary.duckdns.org', clientOptions);
 
 // Runs on connection to the broker
 MQTTclient.on("connect", () => {
-	console.log("connected " + client.connected);
+	console.log("connected " + MQTTclient.connected);
 	// Subscribes to topics on startup
 	let topic = 'sensor/data';
 	MQTTclient.subscribe(topic, (err, granted) => {
