@@ -80,6 +80,7 @@ app.get("/miners", (req, res) => {
     authenticateThenDo(req, res, () => {
         getMiners()
         .then(miners => {
+            console.log(miners)
             res.send(miners)
         })
         .catch(err => {
