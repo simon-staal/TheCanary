@@ -85,7 +85,8 @@ app.get("/miners", (req, res) => {
         } catch (err) {
             console.log(err)
         }
-  });
+    });
+});
 
 //front-end requesting historical data for one miner
 app.get("/graph", (req, res) => {
