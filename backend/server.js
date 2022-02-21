@@ -216,8 +216,8 @@ async function getMiners() {
                 console.log(err);
                 throw err;
             }
+            console.log(result)
         })
-        console.log(result)
         return result;
     } catch (err) {
         console.log(err)
@@ -234,7 +234,7 @@ async function getHistoricalData(id) {
                 console.log(err);
                 throw err;
             }
-
+            console.log(res)
             res.map((elem)=>{
                 y.push(elem.data);
                 x.push(elem.time);
