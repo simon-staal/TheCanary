@@ -17,13 +17,13 @@ var client = mqtt.connect('mqtts://thecanary.duckdns.org', clientOptions);
 client.on("connect", () => {
 	console.log("connected " + client.connected);
 	// Subscribes to topics on startup
-	let topic = 'test/#';
+	let topic = ['test/#', 'sensor/data'];
 	client.subscribe(topic, (err, granted) => {
 		if (err) {
 		 console.log(err);
 		 process.kill(process.pid, 'SIGTERM');
 		}
-		console.log('Subscribed to topic: ' + topic);
+		console.log('Subscribed to topics: ' + topic);
 	});
 	// Testing publishing ability
 	publish('test/test','Hello from backend (securely)');
