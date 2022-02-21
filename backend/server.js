@@ -67,7 +67,7 @@ app.post('/login', (req, res) => {
     // Purely for demonstrative purposes, if we had actual users we would store users + password hashes in a database, and compare to those
     if (req.body.username === 'admin' && req.body.password === "password") {
         let token = jwt.sign({ token: 'poggers'}, privateKey);
-        res.send(token);
+        res.send({token: token});
     }
     else {
         res.status(401).send({ name: "AuthenticationError", message: "Invalid Credentials"});
