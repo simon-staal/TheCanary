@@ -44,26 +44,27 @@ import axios from 'axios';
     },
   }));
 
+async function loginUser(credentials) {
+  return axios.post(process.env.REACT_APP_DOMAIN + '/login', credentials)
+    .then(res => {
+      console.log(res.data);
+      return res.data.token;
+    })
+    .catch(err => {
+      console.log(err);
+    })
+  }
+
 export default function Login({ setToken }) {
   const [username, setUserName] = React.useState();
   const [password, setPassword] = React.useState();
   const handleSubmit = async e => {
     e.preventDefault();
-    const credentials = {
-      username: username,
-      password: password
-    };
-    console.log(credentials);
-    console.log(JSON.stringify(credentials));
-
-    axios.post(process.env.REACT_APP_DOMAIN + '/login', credentials)
-    .then(response => {
-      console.log(response.data); 
-      setToken(response.data.token);
-    })
-    .catch(err => {
-        console.log(err);
+    const token = await loginUser({
+      username,
+      password
     });
+    setToken(token);
   }
 
   return(
