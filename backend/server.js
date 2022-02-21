@@ -77,7 +77,9 @@ app.post('/login', (req, res) => {
 //front-end requesting current data for each miner
 app.get("/miners", (req, res) => {
     authenticateThenDo(req, res, () => {
-        res.send( getMiners());
+        getMiners().then(miners => {
+            res.send(miners)
+        });
     })
   });
 
@@ -86,7 +88,11 @@ app.get("/graph", (req, res) => {
     authenticateThenDo(req, res, () => {
         const minerId = req.query?.id;
         //const data = {y: [4,2,2,3,7,8,5], x: ["Jan", "Febr", "Mar", "Apr", "May", "June", "July"]};
-        if(minerId) res.send( getHistoricalData(minerId));
+        if(minerId) {
+            getHistoricalData(minerId).then(data => {
+                res.send(data);
+            })
+        }
         //get data from database
         res.status(500).send({ error: 'No id(ea) provided' })
     })
@@ -186,24 +192,23 @@ function publish(topic,msg,options=pubOptions){
 // Helper functions
 
 //gets the current miner data from the database and returns them in an array
-function getMiners() {
-    db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray((err, result) => {
+async function getMiners() {
+    const cursor = db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } })
+    let result = await cursor.toArray((err, result) => {
         if(err){
             console.log(err);
             throw err;
         }
-        return result;
     })
-    .then( (res) => {
-        return res;
-    })
+    return result;
 }
 
-function getHistoricalData(id) {
+async function getHistoricalData(id) {
     var query = {id: id};
     let y = [];
     let x = [];
-    db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray((err,res) => {
+    const cursor = db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }})
+    await cursor.toArray((err,res) => {
         if(err){
             console.log(err);
             throw err;
@@ -213,11 +218,8 @@ function getHistoricalData(id) {
             y.push(elem.data);
             x.push(elem.time);
         });
-        return {x:x, y:y}
     })
-    .then(res => {
-        return res
-    })
+    return {x:x,y:y}
 }
 
 function addNewData(id, data) {
