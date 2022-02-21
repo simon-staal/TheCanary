@@ -249,7 +249,7 @@ function addNewData(id, data) {
             throw err;
         }
         else {
-            console.log(obj.result.n + " document(s) deleted");
+            //console.log(obj.result.n + " document(s) deleted");
             db.collection(currDataColl).insertOne({id:id, data:data,time: new Date()}, function(err, res) {
                 if (err){
                     console.log(err);
