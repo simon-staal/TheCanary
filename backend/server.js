@@ -183,8 +183,9 @@ MQTTclient.on("error", error => {
 // Handles receiving messages from the broker
 MQTTclient.on('message', (topic, message, packet) => {
 	if (topic === "sensor/data") {
-		console.log(message.toString());
-        addNewData(message.id, message.data);
+        let msg = JSON.parse(message.toString())
+        console.log(msg);
+        addNewData(msg.id, msg.data);
 	}
 })
 
