@@ -258,7 +258,7 @@ function addNewData(id, data) {
             }); 
         }
     });
-    db.collection(currDataColl).insertOne({id:id, data:data,time: newDate()}, function(err, res) {
+    db.collection(oldDataColl).insertOne({id:id, data:data,time: newDate()}, function(err, res) {
         if (err){
             console.log(err);
             throw err;
