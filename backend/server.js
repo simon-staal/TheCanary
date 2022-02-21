@@ -4,18 +4,26 @@ const path = require("path");
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const https = require('https')
 
 const PORT = process.env.PORT || 8000;
+const HTTPS_PORT = 8443;
 
 const app = express();
 
 app.use(express.static(path.resolve(__dirname, '../client/build')));
-
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true })) ;
-
 app.use(cors());
+
+// Setup certificates for encrypted communication with front-end
+const cert = fs.readFileSync('/etc/letsencrypt/live/thecanary.duckdns.org/fullchain.pem', 'utf8');
+const key = fs.readFileSync('/etc/letsencrypt/live/thecanary.duckdns.org/privkey.pem', 'utf8');
+const SSL_options = {
+  key: key,
+  cert: cert
+};
+const httpsServer = https.createServer(SSL_options, app);
 
 //Initialise MongoDB database
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -24,7 +32,7 @@ const uri = "mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net
 const oldDataColl = "HistoricalData";
 const currDataColl = "CurrentData";
 
-const DBclient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+const DBClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 var db;
 
 // Initialize connection once
@@ -38,6 +46,9 @@ DBClient.connect((err) => {
     app.listen(PORT, () => {
         console.log("Browser server listening on " + PORT);
     });
+    httpsServer.listen(HTTPS_PORT, () => {
+        console.log(`Listening with HTTPS at thecanary.duckdns.org:${HTTPS_PORT}`);
+    })
 });
 
 
@@ -87,6 +98,11 @@ app.post('/freq', (req, res)=>{
         res.send('OK');
     })
 });
+
+// Handles any other routes
+app.use((req, res, next) => {
+    res.status(404).send({ name: "NotFound", message: "This endpoint does not exist"})
+})
 
 /// If the request contains a valid token, process the request defined in function, else return an error
 function authenticateThenDo(req, res, fun) {
@@ -192,3 +208,15 @@ function addNewData(data) {
     
 }
 
+// Handles shutting down application on critical errors
+process.on('SIGTERM', () => {
+	httpsServer.close(() => {
+		console.log('HTTPS server terminated');
+	});
+	MQTTclient.end(() => {
+		console.log('MQTT client disconnected');
+	});
+	DBClient.close(() => {
+		console.log("Disconnected from MongoDB");
+	});
+})
