@@ -34,21 +34,27 @@ app.post('/login', (req, res) => {
     }
 })
 
-// Can't be accessed without authentication
-app.get('/api', (req, res) => {
+function authenticateThenDo(req, fun) {
     let token = req.query.token;
     jwt.verify(token, privateKey, (err, decoded) => {
         if(!err) {
             if(decoded.token === 'poggers') {
-                res.send('You are authenticated');
+                fun();
             }
-            console.log(JSON.stringify(decoded))
-            res.status(401).send({ name: "TokenError", message: "Invalid Token"})
+            else{
+                console.log(JSON.stringify(decoded))
+                res.status(401).send({ name: "TokenError", message: "Invalid Token"})
+            }
         }
         else {
 	    res.status(401).send(err);
         }
     })
+}
+
+// Can't be accessed without authentication
+app.get('/api', (req, res) => {
+    authenticateThenDo(req, () => {res.send('You are authenticated')})
 })
 
 app.listen('13337')
