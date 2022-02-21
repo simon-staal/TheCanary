@@ -2,6 +2,9 @@ import React from 'react';
 import "./Login.css"
 import PropTypes from 'prop-types';
 import TextField from '@mui/material/TextField';
+import { alpha, styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 async function loginUser(credentials) {
     return fetch('http://localhost:8000/login', {
@@ -14,6 +17,42 @@ async function loginUser(credentials) {
       .then(data => data.json())
    }
 
+   const RedditTextField = styled(TextField)(({theme}) => ({
+    "& .MuiInputBase-root": {
+        color: theme.palette.secondary.main,
+        height: '5%',
+        backgroundColor: '#434341',
+        marginTop: '5%',
+        marginBottom: '5%'
+      },
+    "& .MuiFormLabel-root": {
+        color: theme.palette.secondary.main //initial input label color
+    },
+    '& label.Mui-focused': {
+      color: theme.palette.secondary.main,
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: theme.palette.secondary.main,
+        
+      },
+      '&:hover fieldset': {
+        borderColor: theme.palette.primary.main,
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: theme.palette.primary.main,
+        
+      },
+    },
+  }));
+
+  const ColorButton = styled(Button)(({ theme }) => ({
+    color: '#434341',
+    backgroundColor: theme.palette.secondary.main,
+    '&:hover': {
+      backgroundColor:theme.palette.primary.main,
+    },
+  }));
 
 export default function Login({ setToken }) {
   const [username, setUserName] = React.useState();
@@ -28,18 +67,26 @@ export default function Login({ setToken }) {
   }
 
   return(
+    <div style={{width: '20%', flexDirection: 'column', flexWrap: "wrap",   display: 'flex',
+    alignItems: 'center'}}>
+    <Typography variant="h3" color="primary">
+        The Canary
+    </Typography>
     <form onSubmit={handleSubmit}>
-      <label>
-        <TextField id="username" label="Username" variant="outlined" onChange={e => setUserName(e.target.value)} />
-      </label>
-      <label>
-        <p>Password</p>
-        <TextField if="password" label="Password" variant="outlined" onChange={e => setPassword(e.target.value)} />
-      </label>
+        <RedditTextField id="username" label="Username" onChange={e => setUserName(e.target.value)} />
+        
+        <RedditTextField
+            id="password"
+            label="Password"
+            type="password"
+            onChange={e => setPassword(e.target.value)} />
+
       <div>
-        <button type="submit">Submit</button>
+        <ColorButton type="submit">Submit</ColorButton>
       </div>
     </form>
+    </div>
+
   )
 }
 

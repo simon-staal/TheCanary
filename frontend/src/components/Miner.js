@@ -3,13 +3,45 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { CardActionArea } from '@mui/material';
 import Box from '@mui/material/Box';
+import ButtonBase from '@mui/material/ButtonBase';
+import Modal from '@mui/material/Modal';
+import CustomChart  from './chart';
+
+
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '50%',
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  display:"flex",
+  justifyContent:"center",
+  flexDirection:"column",
+  textAlign: "center",
+  backgroundColor: '#313131',
+};
+
+const data = [
+  { argument: 1, value: 10 },
+  { argument: 2, value: 20 },
+  { argument: 3, value: 30 },
+];
+
 
 export default function Miner(props) {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   return (
-    <Card sx={{ display: 'flex', width: "auto",justifyContent: 'center', alignItems: 'center'}}>
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ display: 'flex', width: "auto",justifyContent: 'center', alignItems: 'center', backgroundColor: '#313131'}}>
+      <ButtonBase variant = "contained" sx={{ width: '100%'}} onClick={handleOpen}>
+      <Box sx={{ display: 'flex'}}>
       <CardMedia
             component="img"
             width="100%"
@@ -19,17 +51,37 @@ export default function Miner(props) {
       </Box>
       
         <CardContent sx={{ flex: '1 0 auto' }}>
-          <Typography component="div" variant="h5">
+          <Typography component="div" variant="h5" color="primary">
             {props.id}
           </Typography>
             {props.data.map((elem)=>{
                 return (
-                    <Typography color="text.secondary" component="div" aligh="left" key={elem}>
+                    <Typography color="secondary" component="div" aligh="center" key={elem}>
                         {elem}
                     </Typography>)
             })}
 
         </CardContent>
+        </ButtonBase>
+        <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2" color="primary">
+            {props.id}
+          </Typography>
+          {props.data.map((elem)=>{
+                return (
+                    <Typography color="secondary" component="div" aligh="left" key={elem}>
+                        {elem}
+                    </Typography>)
+          })}
+          <CustomChart/>
+        </Box>
+      </Modal>
     </Card>
   );
 }
