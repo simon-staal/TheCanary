@@ -64,6 +64,7 @@ export default function Login({ setToken }) {
       username,
       password
     });
+    console.log('Got token:'+token)
     setToken(token);
   }
 
