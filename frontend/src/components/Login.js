@@ -7,17 +7,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 
-async function loginUser(credentials) {
-    console.log(credentials);
-    console.log(JSON.stringify(credentials));
-
-    axios.post(process.env.REACT_APP_DOMAIN + '/login', credentials)
-    .then(response => {console.log(response); return response.data.token;})
-    .catch(err => {
-        alert("there was an error" + err);
-    });
-}
-
    const RedditTextField = styled(TextField)(({theme}) => ({
     "& .MuiInputBase-root": {
         color: theme.palette.secondary.main,
@@ -60,11 +49,21 @@ export default function Login({ setToken }) {
   const [password, setPassword] = React.useState();
   const handleSubmit = async e => {
     e.preventDefault();
-    const token = await loginUser({
+    const credentials = {
       username: username,
       password: password
+    };
+    console.log(credentials);
+    console.log(JSON.stringify(credentials));
+
+    axios.post(process.env.REACT_APP_DOMAIN + '/login', credentials)
+    .then(response => {
+      console.log(response); 
+      setToken(token);
+    })
+    .catch(err => {
+        alert("there was an error" + err);
     });
-    setToken(token);
   }
 
   return(

@@ -65,6 +65,7 @@ const privateKey = fs.readFileSync('../AWS/cert/webapp.key')
 // If successful this returns a session token to be included as part of the query parameters for all subsequent endpoint calls
 app.post('/login', (req, res) => {
     // Purely for demonstrative purposes, if we had actual users we would store users + password hashes in a database, and compare to those
+    console.log(req.body)
     if (req.body.username === 'admin' && req.body.password === "password") {
         let token = jwt.sign({ token: 'poggers'}, privateKey);
         res.send({token: token});
