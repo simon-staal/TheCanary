@@ -250,7 +250,7 @@ function addNewData(id, data) {
         }
         else {
             console.log(obj.result.n + " document(s) deleted");
-            db.collection(currDataColl).insertOne({id:id, data:data,time: newDate()}, function(err, res) {
+            db.collection(currDataColl).insertOne({id:id, data:data,time: Date.now()}, function(err, res) {
                 if (err){
                     console.log(err);
                     throw err;
