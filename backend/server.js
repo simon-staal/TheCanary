@@ -82,6 +82,7 @@ app.get("/miners", (req, res) => {
             res.send(miners)
         })
         .catch(err => {
+            console.log(err)
             res.status(500).send(err)
         })
     })
@@ -98,6 +99,7 @@ app.get("/graph", (req, res) => {
                 res.send(data);
             })
             .catch(err => {
+                console.log(err)
                 res.status(500).send(err)
             })
         }
