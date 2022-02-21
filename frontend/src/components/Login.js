@@ -60,6 +60,7 @@ export default function Login({ setToken }) {
   const [password, setPassword] = React.useState();
   const handleSubmit = async e => {
     e.preventDefault();
+    console.log('Trying to get token')
     const token = await loginUser({
       username,
       password
