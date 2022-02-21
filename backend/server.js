@@ -84,27 +84,25 @@ app.get("/miners", (req, res) => {
             res.send(miners)
         } catch (err) {
             console.log(err)
+            res.status(418).send(err)
         }
     });
 });
 
 //front-end requesting historical data for one miner
 app.get("/graph", (req, res) => {
-    authenticateThenDo(req, res, () => {
+    authenticateThenDo(req, res, async () => {
         const minerId = req.query?.id;
-        //const data = {y: [4,2,2,3,7,8,5], x: ["Jan", "Febr", "Mar", "Apr", "May", "June", "July"]};
         if(minerId) {
-            getHistoricalData(minerId)
-            .then(data => {
-                res.send(data);
-            })
-            .catch(err => {
+            try {
+                const data = await getHistoricalData(minerId)
+                res.send(data)
+            } catch (err) {
                 console.log(err)
                 res.status(500).send(err)
-            })
+            }
         }
         else {
-            //get data from database
             res.status(500).send({ error: 'No id(ea) provided' })
         }
     })
@@ -216,22 +214,12 @@ async function getHistoricalData(id) {
     var query = {id: id};
     let y = [];
     let x = [];
-    try {
-        await db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray((err,res) => {
-            if(err){
-                console.log(err);
-                throw err;
-            }
-            console.log(res)
-            res.map((elem)=>{
-                y.push(elem.data);
-                x.push(elem.time);
-            });
-        })
-        return {x:x,y:y}
-    } catch (err) {
-        console.log(err)
-    }
+    let result = await db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray()
+    result.map((elem) => {
+        y.push(elem.data);
+        x.push(elem.data);
+    })
+    return {x: x, y: y}
 }
 
 function addNewData(id, data) {
