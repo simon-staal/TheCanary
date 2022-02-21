@@ -32,5 +32,5 @@ lastMessage = time()
 while(1):   
     client.loop()
     if time() - lastMessage > 10:
-        client.publish('sensor/data', payload='{"id":"1", "data":{"CO2":10, "TVOC":12, "Humidity", 13, "Temperature":4, "Pressure":1}}')
+        client.publish('sensor/data', payload='{"id":"1", "data":{"CO2":10, "TVOC":12, "Humidity": 13, "Temperature":4, "Pressure":1}}')
         lastMessage = time()
