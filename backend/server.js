@@ -2,6 +2,8 @@
 const express = require("express");
 const path = require("path");
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const PORT = process.env.PORT || 8000;
 
@@ -39,39 +41,71 @@ DBClient.connect((err) => {
 });
 
 
+// Can be accessed without authentication
+app.get('/', (req, res) => {
+    console.log(req)
+    res.send("Welcome to our API!")
+})
+
+// Key used for signing login token
+const privateKey = fs.readFileSync('../AWS/cert/webapp.key')
+
+// Used to authenticate the user
+// If successful this returns a session token to be included as part of the query parameters for all subsequent endpoint calls
+app.post('/login', (req, res) => {
+    // Purely for demonstrative purposes, if we had actual users we would store users + password hashes in a database, and compare to those
+    if (req.body.username === 'admin' && req.body.password === "password") {
+        let token = jwt.sign({ token: 'poggers'}, privateKey);
+        res.send(token);
+    }
+    else {
+        res.status(401).send({ name: "AuthenticationError", message: "Invalid Credentials"});
+    }
+});
 
 //front-end requesting current data for each miner
 app.get("/miners", (req, res) => {
-    //const miners = [{id: "Team 1", data: ["sensor data", "air pressure"]}, {id:"Team 2", data: ["sensor data"]},
-    //{id:"Team 3", data: ["sensor data"]},{id:"Team 4", data: ["sensor data"]}];
-    res.send( getMiners());
+    authenticateThenDo(req, res, () => {
+        res.send( getMiners());
+    })
   });
 
 //front-end requesting historical data for one miner
 app.get("/graph", (req, res) => {
-    const minerId = req.query.id;
-    //const data = {y: [4,2,2,3,7,8,5], x: ["Jan", "Febr", "Mar", "Apr", "May", "June", "July"]};
-    res.send( getHistoricalData(minerId));
-    //get data from database
+    authenticateThenDo(req, res, () => {
+        const minerId = req.query.id;
+        res.send( getHistoricalData(minerId));
+        //get data from database
+    })
 });
-
-
-
-app.use('/login', (req, res) => {
-    res.send({
-      token: 'test123'
-    });
-  });
 
 //front-end updating sampling frequency
 //need to send it down to each pi
 app.post('/freq', (req, res)=>{
-    publish('sensor/instructions/sampling', req.body.global);
-    res.send('OK');
+    authenticateThenDo(req, res, () => {
+        publish('sensor/instructions/sampling', req.body.global);
+        res.send('OK');
+    })
 });
 
-
-
+/// If the request contains a valid token, process the request defined in function, else return an error
+function authenticateThenDo(req, res, fun) {
+    let token = req.query.token;
+    jwt.verify(token, privateKey, (err, decoded) => {
+        if(!err) {
+            if(decoded.token === 'poggers') {
+                fun();
+            }
+            else{
+                console.log(JSON.stringify(decoded))
+                res.status(401).send({ name: "TokenError", message: "Invalid Token"})
+            }
+        }
+        else {
+	    res.status(401).send(err);
+        }
+    })
+}
 //------- HTTP done, MQTT from here
 
 const mqtt=require('mqtt');
@@ -82,9 +116,9 @@ const clientOptions = {
     username: "webapp",
     password: "=ZCJ=4uzfZZZ#36f",
 
-    key: fs.readFileSync('../../AWS/cert/webapp.key'), // MAKE SURE THE FILEPATH IS CORRECT
-    cert: fs.readFileSync('../../AWS/cert/webapp.crt'),
-    ca: [ fs.readFileSync('../../AWS/cert/ca.crt') ]
+    key: fs.readFileSync('../AWS/cert/webapp.key'), // MAKE SURE THE FILEPATH IS CORRECT
+    cert: fs.readFileSync('../AWS/cert/webapp.crt'),
+    ca: [ fs.readFileSync('../AWS/cert/ca.crt') ]
 }
 var MQTTclient = mqtt.connect('mqtts://thecanary.duckdns.org', clientOptions);
 
