@@ -39,8 +39,11 @@ app.get('/api', (req, res) => {
     let token = req.query.token;
     jwt.verify(token, privateKey, (err, decoded) => {
         if(!err) {
+            if(decoded.token === 'poggers') {
+                res.send('You are authenticated');
+            }
             console.log(JSON.stringify(decoded))
-            res.send('You are authenticated');
+            res.status(401).send({ name: "TokenError", message: "Invalid Token"})
         }
         else {
 	    res.status(401).send(err);
