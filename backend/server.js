@@ -77,17 +77,14 @@ app.post('/login', (req, res) => {
 
 //front-end requesting current data for each miner
 app.get("/miners", (req, res) => {
-    authenticateThenDo(req, res, () => {
-        getMiners()
-        .then(miners => {
+    authenticateThenDo(req, res, async () => {
+        try {
+            const miners = await getMiners()
             console.log(miners)
             res.send(miners)
-        })
-        .catch(err => {
+        } catch (err) {
             console.log(err)
-            res.status(500).send(err)
-        })
-    })
+        }
   });
 
 //front-end requesting historical data for one miner
@@ -210,18 +207,8 @@ function publish(topic,msg,options=pubOptions){
 
 //gets the current miner data from the database and returns them in an array
 async function getMiners() {
-    let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray((err, result) => {
-        if(err){
-            console.log(err);
-            throw err;
-        }
-        console.log(result)
-        return result;
-    })
-    .then(res => {return res;})
-    .catch(err => {
-        console.log(err)
-    })
+    let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray()
+    return result;
 }
 
 async function getHistoricalData(id) {
