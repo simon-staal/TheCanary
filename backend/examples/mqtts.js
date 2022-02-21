@@ -6,9 +6,9 @@ const clientOptions = {
     username: "webapp",
     password: "=ZCJ=4uzfZZZ#36f",
 
-    key: fs.readFileSync('../cert/webapp.key'),
-    cert: fs.readFileSync('../cert/webapp.crt'),
-    ca: [ fs.readFileSync('../cert/ca.crt') ]
+    key: fs.readFileSync('../../AWS/cert/webapp.key'), // MAKE SURE THE FILEPATH IS CORRECT
+    cert: fs.readFileSync('../../AWS/cert/webapp.crt'),
+    ca: [ fs.readFileSync('../../AWS/cert/ca.crt') ]
 }
 
 var client = mqtt.connect('mqtts://thecanary.duckdns.org', clientOptions);
