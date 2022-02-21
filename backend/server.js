@@ -161,7 +161,7 @@ MQTTclient.on("error", error => {
 
 
 // Handles receiving messages from the broker
-client.on('message', (topic, message, packet) => {
+MQTTclient.on('message', (topic, message, packet) => {
 	if (topic === "sensor/data") {
 		console.log(message.toString());
 	}
@@ -175,8 +175,8 @@ const pubOptions={
 // You can call this function to publish to things
 function publish(topic,msg,options=pubOptions){
 	console.log("publishing",msg);
-	if (client.connected == true){
-		client.publish(topic,msg,options);
+	if (MQTTclient.connected == true){
+		MQTTclient.publish(topic,msg,options);
 	}
 }
 
