@@ -35,14 +35,18 @@ client.on("error", error => {
 	process.kill(process.pid, 'SIGTERM');
 });
 
+// Handles receiving messages from the broker
 client.on('message', (topic, message, packet) => {
     if (topic === "test/test") {
         console.log(message.toString());
     }
+	if (topic === "sensor/data") {
+		console.log(message.toString());
+	}
 })
 
 const pubOptions={
-	retain:true,
+	retain:false,
 	qos:1
 };
 

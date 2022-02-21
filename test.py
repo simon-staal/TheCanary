@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+from time import time
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -27,4 +28,8 @@ client.connect("thecanary.duckdns.org", 8883, 60)
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
-client.loop_forever()
+lastMessage = time()
+while(1):   
+    client.loop()
+    if time() - lastMessage > 10:
+        client.publish('sensor/data', payload='{"name":"pi", "CO2":10, "TVOC":12, "Humidity", 13, "Temperature":4, "Pressure":1}')
