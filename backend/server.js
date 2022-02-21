@@ -128,6 +128,7 @@ app.use((req, res, next) => {
 /// If the request contains a valid token, process the request defined in function, else return an error
 function authenticateThenDo(req, res, fun) {
     let token = req.query.token;
+    console.log(token)
     jwt.verify(token, privateKey, (err, decoded) => {
         if(!err) {
             if(decoded.token === 'poggers') {
@@ -139,7 +140,8 @@ function authenticateThenDo(req, res, fun) {
             }
         }
         else {
-	    res.status(401).send(err);
+            console.log('Failed verification')
+	        res.status(401).send(err);
         }
     })
 }
