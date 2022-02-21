@@ -187,14 +187,16 @@ function publish(topic,msg,options=pubOptions){
 
 //gets the current miner data from the database and returns them in an array
 function getMiners() {
-    const cursor = db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } })
-    let result = await cursor.toArray((err, result) => {
+    const cursor = db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray((err, result) => {
         if(err){
             console.log(err);
             throw err;
         }
+        return result;
     })
-    return result;
+    .then( (res) => {
+        return res;
+    })
 }
 
 function getHistoricalData(id) {
