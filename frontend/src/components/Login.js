@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 async function loginUser(credentials) {
-    return fetch('http://localhost:8000/login', {
+    return fetch(process.env.REACT_APP_DOMAIN + '/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

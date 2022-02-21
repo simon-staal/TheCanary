@@ -48,7 +48,7 @@ function App() {
 
   React.useEffect(() => {
       console.log(process.env.REACT_APP_DOMAIN);
-      axios.get(process.env.REACT_APP_DOMAIN + '/miners')
+      axios.get(process.env.REACT_APP_DOMAIN + '/miners', {params: {token: sessionStorage.getItem('token')}})
         .then(res => {
           setMiners(res.data);
         })
@@ -57,8 +57,7 @@ function App() {
         },)
     }, []); //error handling
   let miners2 = [{id: "Team 1", data: ["sensor data", "air pressure"]}, {id:"Team 2", data: ["sensor data"]},
-  {id:"Team 3", data: ["sensor data"]}
-];
+  {id:"Team 3", data: ["sensor data"]}];
   let xs = 2
   if(miners.length<=4){
     xs = 6;

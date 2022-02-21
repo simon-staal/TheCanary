@@ -27,11 +27,6 @@ const style = {
   backgroundColor: '#313131',
 };
 
-const data = [
-  { argument: 1, value: 10 },
-  { argument: 2, value: 20 },
-  { argument: 3, value: 30 },
-];
 
 
 export default function Miner(props) {
@@ -54,11 +49,12 @@ export default function Miner(props) {
           <Typography component="div" variant="h5" color="primary">
             {props.id}
           </Typography>
-            {props.data.map((elem)=>{
+            
+            { Object.keys(props.data).map((field) => {
                 return (
-                    <Typography color="secondary" component="div" aligh="center" key={elem}>
-                        {elem}
-                    </Typography>)
+                  <Typography color="secondary" component="div" aligh="center" key={field}>
+                        {field}: {props.data[field]}
+                  </Typography>)
             })}
 
         </CardContent>

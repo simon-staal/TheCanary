@@ -84,9 +84,11 @@ app.get("/miners", (req, res) => {
 //front-end requesting historical data for one miner
 app.get("/graph", (req, res) => {
     authenticateThenDo(req, res, () => {
-        const minerId = req.query.id;
-        res.send( getHistoricalData(minerId));
+        const minerId = req.query?.id;
+        //const data = {y: [4,2,2,3,7,8,5], x: ["Jan", "Febr", "Mar", "Apr", "May", "June", "July"]};
+        if(minerId) res.send( getHistoricalData(minerId));
         //get data from database
+        res.status(500).send({ error: 'No id(ea) provided' })
     })
 });
 
@@ -164,6 +166,7 @@ MQTTclient.on("error", error => {
 MQTTclient.on('message', (topic, message, packet) => {
 	if (topic === "sensor/data") {
 		console.log(message.toString());
+        addNewData(message.id, message.data);
 	}
 })
 
@@ -184,27 +187,59 @@ function publish(topic,msg,options=pubOptions){
 
 //gets the current miner data from the database and returns them in an array
 function getMiners() {
-    db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray((err, result) => {
-        if(err){
-            console.log(err);
-            throw err;
-        }
-        return result;
-    });
-}
-
-function getHistoricalData(id) {
-    var query = {id: id};
-    db.collection(oldDataColl).find(query).toArray((err,res) => {
+    const cursor = db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } })
+    let result = await cursor.toArray((err, result) => {
         if(err){
             console.log(err);
             throw err;
         }
     })
+    return result;
 }
 
-function addNewData(data) {
-    
+function getHistoricalData(id) {
+    var query = {id: id};
+    let y = [];
+    let x = [];
+    const cursor = db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }})
+    await cursor.toArray((err,res) => {
+        if(err){
+            console.log(err);
+            throw err;
+        }
+
+        res.map((elem)=>{
+            y.push(elem.data);
+            x.push(elem.time);
+        });
+    })
+    return {x:x,y:y}
+}
+
+function addNewData(id, data) {
+    var query = {id: id};
+    //delete data for this id form database
+    db.collection(currDataColl).deleteMany(query,(err, obj) => {
+        if (err){
+            console.log(err);
+            throw err;
+        }
+        else {
+            console.log(obj.result.n + " document(s) deleted");
+            db.collection(currDataColl).insertOne({id:id, data:data,time: newDate()}, function(err, res) {
+                if (err){
+                    console.log(err);
+                    throw err;
+                }
+            }); 
+        }
+    });
+    db.collection(currDataColl).insertOne({id:id, data:data,time: newDate()}, function(err, res) {
+        if (err){
+            console.log(err);
+            throw err;
+        }
+    });
 }
 
 // Handles shutting down application on critical errors
