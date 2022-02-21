@@ -14,7 +14,7 @@ async function loginUser(credentials) {
       },
       body: JSON.stringify(credentials)
     })
-      .then(data => data.json())
+      .then(data => {return data;})
    }
 
    const RedditTextField = styled(TextField)(({theme}) => ({

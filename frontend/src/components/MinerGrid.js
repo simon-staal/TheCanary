@@ -9,6 +9,7 @@ import Miner from './Miner.js'
 import { experimentalStyled as styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import axios from 'axios'
 
 
 
@@ -19,12 +20,36 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-export default function Miners(props) {
+export default function Miners() {
+    const [miners, setMiners] = React.useState([]);
+    let xs = 2
+    if(miners.length<=4){
+      xs = 6;
+    }
+    else if(miners.length<=8){
+      xs = 3;
+    }
+    else if(miners.length<=12){
+      xs = 2;
+    }
+    else {
+      xs = 1;
+    }
+    React.useEffect(() => {
+        console.log(process.env.REACT_APP_DOMAIN);
+        axios.get(process.env.REACT_APP_DOMAIN + '/miners', {params: {token: sessionStorage.getItem('token')}})
+          .then(res => {
+            setMiners(res.data);
+          })
+          .catch(err => {
+            console.log(err);
+          },)
+      }, []); //error handling
     return(
         <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
-        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: props.xs, sm: 8, md: 12 }}>
-        {props.miners.map((miner) => (
-            <Grid item xs={props.xs}  key={miner.id}>
+        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: xs, sm: 8, md: 12 }}>
+        {miners.map((miner) => (
+            <Grid item xs={xs}  key={miner.id}>
                 <Miner id={miner.id} data={miner.data}/>
             </Grid>
         ))}

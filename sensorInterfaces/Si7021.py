@@ -36,6 +36,7 @@ class SENSOR():
 
     def getTemp(self):
         #send the measure temperature command
+        print("getTemp called")
         meas_temp = smbus2.i2c_msg.write(0x40,[0xf3])
         self.bus.i2c_rdwr(meas_temp)
 
@@ -51,6 +52,7 @@ class SENSOR():
         return self.__convertTemp(rd_temp)
 
     def getHumid(self):
+        print("getHumid called")
         def convertHumid(measurement):
             result = (125*measurement/65536) -6
             return result

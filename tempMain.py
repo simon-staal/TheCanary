@@ -5,7 +5,7 @@ import sensorInterfaces.bmp280 as bmp280
 import smbus2
 import time
 import paho.mqtt.client as mqtt
-import DataProcessing as Data
+from DataProcessing import Data
 import numpy as np
 import json
 
@@ -18,18 +18,20 @@ def initSensors():
     tempHumiditySensor = Si7021.SENSOR(bus)
     #airPressureSensor = bmp280.Sensor(bus)
 
-    #co2Data = Data.Data(airQualitySensor, airQualitySensor.getco2())
-    tempData = Data.Data(tempHumiditySensor, tempHumiditySensor.getTemp())
-    humidityData = Data.Data(tempHumiditySensor, tempHumiditySensor.getHumid())
-    #airPressureData = Data.Data(airPressureSensor, airPressureSensor.pressure)
+    #co2Data = Data(airQualitySensor, airQualitySensor.getco2())
+    tempData = Data("Temperature Sensor", tempHumiditySensor.getTemp)
+    humidityData = Data("Humidity Sensor", tempHumiditySensor.getHumid)
+    #airPressureData = Data(airPressureSensor, airPressureSensor.pressure)
 
     #for item in {co2Data, tempData, humidityData, airPressureData}:
     #    item.last20val = np.full_like(np.arange(6, dtype=float), item.getReading())
 
     #return co2Data, tempData, humidityData, airPressureData
 
-    tempData.last20val = np.full_like(np.arange(6, dtype=float), tempData.getReading())
-    humidityData.last20val = np.full_like(np.arange(6, dtype=float), humidityData.getReading())    
+    #tempData.last20val = np.full_like(np.arange(6, dtype=float), tempData.getReading())
+    #humidityData.last20val = np.full_like(np.arange(6, dtype=float), humidityData.getReading())    
+
+    print("getting reading ", humidityData.getReading())
 
     return tempData, humidityData
 
@@ -79,15 +81,18 @@ def sendInfo(msg, client):
     print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
 
 def main():
-    
+    print("here in main")
     #co2, temp, humidity, airPresssure = initSensors()
     temp, humidity = initSensors()
-    client = initMQTT()
+    print("data initialised")
+    #client = initMQTT()
     
     while(1): # placeholder gonna figure out different sensor pollrates 
-        client.loop()
+        #client.loop()
+        print("in loop")
         for i in {temp, humidity}:
             print(i.getData())
+            print("data now sleep")
             time.sleep(i.pollRate)
 
 
