@@ -62,7 +62,7 @@ export default function Login({ setToken }) {
       setToken(response.data.token);
     })
     .catch(err => {
-        alert("there was an error" + err);
+        console.log(err);
     });
   }
 
