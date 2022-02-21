@@ -125,7 +125,6 @@ function authenticateThenDo(req, res, fun) {
 //------- HTTP done, MQTT from here
 
 const mqtt=require('mqtt');
-const fs = require('fs');
 
 const clientOptions = {
     clientID: "mqttjs01",
