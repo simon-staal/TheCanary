@@ -77,9 +77,13 @@ app.post('/login', (req, res) => {
 //front-end requesting current data for each miner
 app.get("/miners", (req, res) => {
     authenticateThenDo(req, res, () => {
-        getMiners().then(miners => {
+        getMiners()
+        .then(miners => {
             res.send(miners)
-        });
+        })
+        .catch(err => {
+            res.status(500).send(err)
+        })
     })
   });
 
@@ -89,8 +93,12 @@ app.get("/graph", (req, res) => {
         const minerId = req.query?.id;
         //const data = {y: [4,2,2,3,7,8,5], x: ["Jan", "Febr", "Mar", "Apr", "May", "June", "July"]};
         if(minerId) {
-            getHistoricalData(minerId).then(data => {
+            getHistoricalData(minerId)
+            .then(data => {
                 res.send(data);
+            })
+            .catch(err => {
+                res.status(500).send(err)
             })
         }
         //get data from database
