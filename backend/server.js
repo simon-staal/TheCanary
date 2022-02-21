@@ -203,33 +203,39 @@ function publish(topic,msg,options=pubOptions){
 
 //gets the current miner data from the database and returns them in an array
 async function getMiners() {
-    const cursor = db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } })
-    let result = await cursor.toArray((err, result) => {
-        if(err){
-            console.log(err);
-            throw err;
-        }
-    })
-    return result;
+    try {
+        let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray((err, result) => {
+            if(err){
+                console.log(err);
+                throw err;
+            }
+        })
+        return result;
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 async function getHistoricalData(id) {
     var query = {id: id};
     let y = [];
     let x = [];
-    const cursor = db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }})
-    await cursor.toArray((err,res) => {
-        if(err){
-            console.log(err);
-            throw err;
-        }
+    try {
+        await db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray((err,res) => {
+            if(err){
+                console.log(err);
+                throw err;
+            }
 
-        res.map((elem)=>{
-            y.push(elem.data);
-            x.push(elem.time);
-        });
-    })
-    return {x:x,y:y}
+            res.map((elem)=>{
+                y.push(elem.data);
+                x.push(elem.time);
+            });
+        })
+        return {x:x,y:y}
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 function addNewData(id, data) {
