@@ -58,8 +58,8 @@ export default function Login({ setToken }) {
 
     axios.post(process.env.REACT_APP_DOMAIN + '/login', credentials)
     .then(response => {
-      console.log(response); 
-      setToken(token);
+      console.log(response.data); 
+      setToken(response.data.token);
     })
     .catch(err => {
         alert("there was an error" + err);
