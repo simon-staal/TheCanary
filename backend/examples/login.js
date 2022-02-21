@@ -34,7 +34,7 @@ app.post('/login', (req, res) => {
     }
 })
 
-function authenticateThenDo(req, fun) {
+function authenticateThenDo(req, res, fun) {
     let token = req.query.token;
     jwt.verify(token, privateKey, (err, decoded) => {
         if(!err) {
@@ -54,7 +54,7 @@ function authenticateThenDo(req, fun) {
 
 // Can't be accessed without authentication
 app.get('/api', (req, res) => {
-    authenticateThenDo(req, () => {res.send('You are authenticated')})
+    authenticateThenDo(req, res, () => {res.send('You are authenticated')})
 })
 
 app.listen('13337')
