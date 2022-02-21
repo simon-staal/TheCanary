@@ -103,8 +103,10 @@ app.get("/graph", (req, res) => {
                 res.status(500).send(err)
             })
         }
-        //get data from database
-        res.status(500).send({ error: 'No id(ea) provided' })
+        else {
+            //get data from database
+            res.status(500).send({ error: 'No id(ea) provided' })
+        }
     })
 });
 
