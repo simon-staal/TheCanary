@@ -217,6 +217,7 @@ async function getMiners() {
                 throw err;
             }
         })
+        console.log(result)
         return result;
     } catch (err) {
         console.log(err)
