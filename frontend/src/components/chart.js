@@ -47,7 +47,7 @@ ChartJS.register(
           }
         }
       },
-      x: {
+      xAxes: [{
         type: 'time',
         time: {
           format: 'YYYY-MM-DDTHH:MM:SSZ',
@@ -67,7 +67,7 @@ ChartJS.register(
             size: 14,
           }
         }
-      },
+      }],
     },
   };
   
