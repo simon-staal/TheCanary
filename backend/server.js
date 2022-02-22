@@ -54,7 +54,7 @@ DBClient.connect((err) => {
 
 // Can be accessed without authentication
 app.get('/', (req, res) => {
-    console.log(req)
+    console.log(req.body)
     res.send("Welcome to our API!")
 })
 
@@ -217,7 +217,7 @@ async function getHistoricalData(id) {
     let result = await db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray()
     result.map((elem) => {
         y.push(elem.data);
-        x.push(elem.time);
+        x.push(elem.time.getTime());
     })
     return {x: x, y: y}
 }
