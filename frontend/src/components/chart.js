@@ -50,8 +50,19 @@ ChartJS.register(
       xAxes: [{
         type: 'time',
         time: {
-          format: 'YYYY-MM-DDTHH:MM:SSZ',
-          unit: 'minute'
+          unit: 'minute',
+          unitStepSize: 1000,
+          displayFormats: {
+            millisecond: 'MMM DD',
+            second: 'MMM DD',
+            minute: 'MMM DD',
+            hour: 'MMM DD',
+            day: 'MMM DD',
+            week: 'MMM DD',
+            month: 'MMM DD',
+            quarter: 'MMM DD',
+            year: 'MMM DD',
+          }
         },
         ticks: {
           color: "white",
