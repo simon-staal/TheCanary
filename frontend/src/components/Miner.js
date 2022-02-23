@@ -54,15 +54,10 @@ export default function Miner(props) {
           <Typography component="div" variant="h5" color="primary">
             {props.id}
           </Typography>
-            {props.data.map((elem)=>{
-                return (
-                    <Typography color="secondary" component="div" aligh="center" key={elem}>
-                        {elem}
-                    </Typography>)
-            })}
+            
             { Object.keys(props.data).map((field) => {
                 return (
-                  <Typography color="secondary" component="div" aligh="center" key={elem}>
+                  <Typography color="secondary" component="div" aligh="center" key={field}>
                         {field}: {props.data[field]}
                   </Typography>)
             })}
