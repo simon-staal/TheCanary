@@ -1,7 +1,8 @@
 const express = require("express");
 const path = require("path");
 const cors = require('cors');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const PORT = process.env.PORT || 8000;
 
@@ -23,7 +24,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    console.log(JSON.stringify(req));
+    console.log(req.body);
     if (req.body.username === 'admin' && req.body.password === "password") {
         let token = jwt.sign({ token: 'poggers'}, privateKey);
         res.send(token);
@@ -42,7 +43,7 @@ app.get('/api', (req, res) => {
             res.send('You are authenticated');
         }
         else {
-            res.send(err);
+	    res.status(401).send(err);
         }
     })
 })
