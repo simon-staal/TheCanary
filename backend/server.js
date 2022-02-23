@@ -22,7 +22,7 @@ const uri = "mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net
 const oldDataColl = "HistoricalData";
 const currDataColl = "CurrentData";
 
-const DBclient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+const DBClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 var db;
 
 // Initialize connection once
@@ -76,6 +76,8 @@ app.post('/freq', (req, res)=>{
 
 const mqtt=require('mqtt');
 const fs = require('fs');
+const { cursorTo } = require("readline");
+const { resolve } = require("path/posix");
 
 const clientOptions = {
     clientID: "mqttjs01",
@@ -115,6 +117,7 @@ MQTTclient.on("error", error => {
 client.on('message', (topic, message, packet) => {
 	if (topic === "sensor/data") {
 		console.log(message.toString());
+        addNewData(message.id, message.data);
 	}
 })
 
@@ -140,21 +143,52 @@ function getMiners() {
             console.log(err);
             throw err;
         }
-        return result;
-    });
+        resolve(result);
+    }).then((res)=>{return res;})
 }
 
 function getHistoricalData(id) {
     var query = {id: id};
-    db.collection(oldDataColl).find(query).toArray((err,res) => {
+    let y = [];
+    let x = [];
+    const cursor = db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }})
+    await cursor.toArray((err,res) => {
         if(err){
             console.log(err);
             throw err;
         }
+
+        res.map((elem)=>{
+            y.push(elem.data);
+            x.push(elem.time);
+        });
     })
+    return {x:x,y:y}
 }
 
-function addNewData(data) {
-    
+function addNewData(id, data) {
+    var query = {id: id};
+    //delete data for this id form database
+    db.collection(currDataColl).deleteMany(query,(err, obj) => {
+        if (err){
+            console.log(err);
+            throw err;
+        }
+        else {
+            console.log(obj.result.n + " document(s) deleted");
+            db.collection(currDataColl).insertOne({id:id, data:data,time: newDate()}, function(err, res) {
+                if (err){
+                    console.log(err);
+                    throw err;
+                }
+            }); 
+        }
+    });
+    db.collection(currDataColl).insertOne({id:id, data:data,time: newDate()}, function(err, res) {
+        if (err){
+            console.log(err);
+            throw err;
+        }
+    });
 }
 

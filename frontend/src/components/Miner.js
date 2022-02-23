@@ -60,6 +60,12 @@ export default function Miner(props) {
                         {elem}
                     </Typography>)
             })}
+            { Object.keys(props.data).map((field) => {
+                return (
+                  <Typography color="secondary" component="div" aligh="center" key={elem}>
+                        {field}: {props.data[field]}
+                  </Typography>)
+            })}
 
         </CardContent>
         </ButtonBase>
