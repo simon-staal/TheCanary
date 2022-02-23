@@ -26,6 +26,7 @@ client.on("connect", () => {
 		console.log('Subscribed to topics: ' + topic);
 	});
 	// Testing publishing ability
+	publish('sensor/instructions/test', 'GREETINGS EARTHLING');
 	publish('test/test','Hello from backend (securely)');
 })
 
@@ -41,7 +42,8 @@ client.on('message', (topic, message, packet) => {
         console.log(message.toString());
     }
 	if (topic === "sensor/data") {
-		console.log(message.toString());
+		let data = JSON.parse(message.toString());
+		console.log(data);
 	}
 })
 
