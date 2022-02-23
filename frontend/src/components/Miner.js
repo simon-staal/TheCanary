@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Modal from '@mui/material/Modal';
-import CustomChart  from './chart';
+import ChartGrid  from './chartGrid';
 
 
 
@@ -15,7 +15,7 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '50%',
+  width: '70%',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -54,11 +54,12 @@ export default function Miner(props) {
           <Typography component="div" variant="h5" color="primary">
             {props.id}
           </Typography>
-            {props.data.map((elem)=>{
+            
+            { Object.keys(props.data).map((field) => {
                 return (
-                    <Typography color="secondary" component="div" aligh="center" key={elem}>
-                        {elem}
-                    </Typography>)
+                  <Typography color="secondary" component="div" aligh="center" key={field}>
+                        {field}: {props.data[field]}
+                  </Typography>)
             })}
 
         </CardContent>
@@ -79,7 +80,7 @@ export default function Miner(props) {
                         {elem}
                     </Typography>)
           })}
-          <CustomChart/>
+          <ChartGrid id = {props.id}/>
         </Box>
       </Modal>
     </Card>
