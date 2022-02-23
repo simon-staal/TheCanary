@@ -83,7 +83,7 @@ ChartJS.register(
     options.plugins.title.text=props.chartdata.label;
 
     React.useEffect(() => {
-      axios.get(process.env.REACT_APP_DOMAIN + props.chartdata.route, { params: { id: props.id } })
+      axios.get(process.env.REACT_APP_DOMAIN + props.chartdata.route, { params: { id: props.id, token: sessionStorage.getItem('token')} })
         .then(res => {
           setXVal(res.data.x);
           setYVal(res.data.y);

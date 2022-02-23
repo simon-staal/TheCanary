@@ -27,11 +27,6 @@ const style = {
   backgroundColor: '#313131',
 };
 
-const data = [
-  { argument: 1, value: 10 },
-  { argument: 2, value: 20 },
-  { argument: 3, value: 30 },
-];
 
 
 export default function Miner(props) {
