@@ -49,10 +49,11 @@ app.get("/miners", (req, res) => {
 
 //front-end requesting historical data for one miner
 app.get("/graph", (req, res) => {
-    const minerId = req.query.id;
+    const minerId = req.query?.id;
     //const data = {y: [4,2,2,3,7,8,5], x: ["Jan", "Febr", "Mar", "Apr", "May", "June", "July"]};
-    res.send( getHistoricalData(minerId));
+    if(minerId) res.send( getHistoricalData(minerId));
     //get data from database
+    res.status(500).send({ error: 'No id(ea) provided' })
 });
 
 
