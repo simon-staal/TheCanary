@@ -12,8 +12,8 @@ class Data():
     def __init__(self, sensorName, dataFunc):
         self.last20Val
         self.sensor = sensorName
-        self.minVal = 1
-        self.maxVal = 1
+        self.minVal = 0
+        self.maxVal = 1000000000
         self.pollingRate = 0.20
         self.defaultPollingRate = 0.20
         self.dangerLevel = GREEN #DFS would actually be useful here. levels could be green amber red
@@ -35,6 +35,7 @@ class Data():
     def consistentBadValues(self):
         return self.avgVal > self.maxVal | self.avgVal < self.minVal
 
+    @property
     def pollRate(self):
         return 1/self.pollingRate
 

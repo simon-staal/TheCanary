@@ -14,19 +14,25 @@ CanaryId = "noId"
 #set up sensors - i2c connections + mqtt
 def initSensors():
     bus = smbus2.SMBus(1)
-    airQualitySensor = ccs811.SENSOR(bus)
+    #airQualitySensor = ccs811.SENSOR(bus)
     tempHumiditySensor = Si7021.SENSOR(bus)
-    airPressureSensor = bmp280.Sensor(bus)
+    #airPressureSensor = bmp280.Sensor(bus)
 
-    co2Data = Data.Data(airQualitySensor, airQualitySensor.getco2())
+    #co2Data = Data.Data(airQualitySensor, airQualitySensor.getco2())
     tempData = Data.Data(tempHumiditySensor, tempHumiditySensor.getTemp())
     humidityData = Data.Data(tempHumiditySensor, tempHumiditySensor.getHumid())
-    airPressureData = Data.Data(airPressureSensor, airPressureSensor.pressure)
+    #airPressureData = Data.Data(airPressureSensor, airPressureSensor.pressure)
 
-    for item in {co2Data, tempData, humidityData, airPressureData}:
-        item.last20val = np.full_like(np.arange(6, dtype=float), item.getReading())
+    #for item in {co2Data, tempData, humidityData, airPressureData}:
+    #    item.last20val = np.full_like(np.arange(6, dtype=float), item.getReading())
 
-    return co2Data, tempData, humidityData, airPressureData
+    #return co2Data, tempData, humidityData, airPressureData
+
+    tempData.last20val = np.full_like(np.arange(6, dtype=float), tempData.getReading())
+    humidityData.last20val = np.full_like(np.arange(6, dtype=float), humidityData.getReading())    
+
+    return tempData, humidityData
+
 
 def shutDown():
     #might put other stuff here
@@ -65,23 +71,24 @@ def initMQTT():
     # MsgInfo = client.publish("IC.embedded/TeamEpicGamers/test","hello")
     # print("...")
     # print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
-
     return client
 
 def sendInfo(msg, client):
-    MsgInfo = client.publish("sensor/", msg)
+    MsgInfo = client.publish("sensor/",msg)
     print("...")
     print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
 
 def main():
     
-    co2, temp, humidity, airPresssure = initSensors()
+    #co2, temp, humidity, airPresssure = initSensors()
+    temp, humidity = initSensors()
     client = initMQTT()
     
     while(1): # placeholder gonna figure out different sensor pollrates 
-        for i in {co2, temp, humidity, airPresssure}:
-            sendInfo(i.getData(), client)
-            time.sleep(i.pollRate())
+        client.loop()
+        for i in {temp, humidity}:
+            print(i.getData())
+            time.sleep(i.pollRate)
 
 
     
