@@ -12,9 +12,9 @@ async function loginUser(credentials) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(credentials)
+      body: credentials
     })
-      .then(data => {return data;})
+      .then(data => {console.log(data); return data.token;})
    }
 
    const RedditTextField = styled(TextField)(({theme}) => ({
@@ -60,8 +60,8 @@ export default function Login({ setToken }) {
   const handleSubmit = async e => {
     e.preventDefault();
     const token = await loginUser({
-      username,
-      password
+      username: username,
+      password: password
     });
     setToken(token);
   }
