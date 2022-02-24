@@ -44,7 +44,9 @@ export const theme = createTheme({
 
 function App() {
   const {token, setToken} = useToken();
-
+  useEffect(() => {
+    document.title = "The Canary"
+  }, [])
   if(!token) {
     return (
       <ThemeProvider theme = {theme}>
