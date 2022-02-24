@@ -49,7 +49,8 @@ ChartJS.register(
       x: {
         type: 'time',
         time: {
-          unit: 'second'
+          format: 'YYYY-MM-DDTHH:MM:SSZ',
+          unit: 'minute'
         },
         ticks: {
           color: "white",
