@@ -9,15 +9,12 @@ import Typography from '@mui/material/Typography';
 async function loginUser(credentials) {
     console.log(credentials);
     console.log(JSON.stringify(credentials));
-    return fetch(process.env.REACT_APP_DOMAIN + '/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(credentials)
-    })
-      .then(data => {console.log(data); return data.token;})
-   }
+    
+    axios.post(process.env.REACT_APP_DOMAIN + '/login', credentials)
+    .then(response => {console.log(response); return response.token;})
+    .catch(err => {
+        alert("there was an error" + err);
+    });
 
    const RedditTextField = styled(TextField)(({theme}) => ({
     "& .MuiInputBase-root": {
