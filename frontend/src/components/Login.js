@@ -12,7 +12,7 @@ async function loginUser(credentials) {
     console.log(JSON.stringify(credentials));
 
     axios.post(process.env.REACT_APP_DOMAIN + '/login', credentials)
-    .then(response => {console.log(response); return response.token;})
+    .then(response => {console.log(response); return response.data.token;})
     .catch(err => {
         alert("there was an error" + err);
     });
