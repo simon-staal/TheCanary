@@ -47,6 +47,10 @@ ChartJS.register(
         }
       },
       x: {
+        type: 'time',
+        time: {
+          unit: 'second'
+        },
         ticks: {
           color: "white",
           font: {
