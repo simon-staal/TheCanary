@@ -114,7 +114,7 @@ app.get("/CO2", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, CO2)
+                const data = await getHistoricalData(minerId, "CO2")
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -133,7 +133,7 @@ app.get("/Pressure", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, Pressure)
+                const data = await getHistoricalData(minerId, "Pressure")
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -151,7 +151,7 @@ app.get("/Temperature", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, Temperature)
+                const data = await getHistoricalData(minerId, "Temperature")
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -168,7 +168,7 @@ app.get("/Humidity", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, Humidity)
+                const data = await getHistoricalData(minerId, "Humidity")
                 res.send(data)
             } catch (err) {
                 console.log(err)
