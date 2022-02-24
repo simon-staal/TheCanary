@@ -51,7 +51,6 @@ ChartJS.register(
         type: 'time',
         time: {
           unit: 'minute',
-          unitStepSize: 1000,
           displayFormats: {
             millisecond: 'MMM DD',
             second: 'MMM DD',
