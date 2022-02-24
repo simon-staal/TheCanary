@@ -49,8 +49,10 @@ ChartJS.register(
       },
       xAxes: [{
         type: 'time',
+        parsing: 'false',
         time: {
           unit: 'minute',
+          tooltipFormat: 'll HH:mm',
           displayFormats: {
             millisecond: 'MMM DD',
             second: 'MMM DD',
