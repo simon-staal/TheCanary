@@ -77,17 +77,16 @@ app.post('/login', (req, res) => {
 
 //front-end requesting current data for each miner
 app.get("/miners", (req, res) => {
-    authenticateThenDo(req, res, () => {
-        getMiners()
-        .then(miners => {
+    authenticateThenDo(req, res, async () => {
+        try {
+            const miners = await getMiners()
+            console.log(miners)
             res.send(miners)
-        })
-        .catch(err => {
+        } catch (err) {
             console.log(err)
-            res.status(500).send(err)
-        })
-    })
-  });
+        }
+    });
+});
 
 //front-end requesting historical data for one miner
 app.get("/graph", (req, res) => {
@@ -128,6 +127,7 @@ app.use((req, res, next) => {
 /// If the request contains a valid token, process the request defined in function, else return an error
 function authenticateThenDo(req, res, fun) {
     let token = req.query.token;
+    console.log(token)
     jwt.verify(token, privateKey, (err, decoded) => {
         if(!err) {
             if(decoded.token === 'poggers') {
@@ -139,7 +139,8 @@ function authenticateThenDo(req, res, fun) {
             }
         }
         else {
-	    res.status(401).send(err);
+            console.log('Failed verification')
+	        res.status(401).send(err);
         }
     })
 }
@@ -207,17 +208,8 @@ function publish(topic,msg,options=pubOptions){
 
 //gets the current miner data from the database and returns them in an array
 async function getMiners() {
-    try {
-        let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray((err, result) => {
-            if(err){
-                console.log(err);
-                throw err;
-            }
-        })
-        return result;
-    } catch (err) {
-        console.log(err)
-    }
+    let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray()
+    return result;
 }
 
 async function getHistoricalData(id) {
@@ -230,7 +222,7 @@ async function getHistoricalData(id) {
                 console.log(err);
                 throw err;
             }
-
+            console.log(res)
             res.map((elem)=>{
                 y.push(elem.data);
                 x.push(elem.time);
