@@ -69,10 +69,10 @@ export default function Miner(props) {
           <Typography id="modal-modal-title" variant="h6" component="h2" color="primary">
             {props.id}
           </Typography>
-          {props.data.map((elem)=>{
+          {Object.keys(props.data).map((field)=>{
                 return (
-                    <Typography color="secondary" component="div" aligh="left" key={elem}>
-                        {elem}
+                    <Typography color="secondary" component="div" aligh="left" key={field}>
+                        {field}: {props.data.field}
                     </Typography>)
           })}
           <ChartGrid id = {props.id}/>
