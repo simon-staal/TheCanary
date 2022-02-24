@@ -217,7 +217,7 @@ async function getHistoricalData(id) {
     let result = await db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray()
     result.map((elem) => {
         y.push(elem.data);
-        x.push(elem.data);
+        x.push(elem.time);
     })
     return {x: x, y: y}
 }
