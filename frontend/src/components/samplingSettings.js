@@ -42,7 +42,7 @@ export default function BasicSelect() {
     const oldfreq = freq;
     setFreq(event.target.value);
     //send post request to backend
-    axios.post(process.env.REACT_APP_DOMAIN + '/freq', {params:{global: event.target.value, token: sessionStorage.getItem('token')}})
+    axios.post(process.env.REACT_APP_DOMAIN + '/freq', {global: event.target.value},{params:{token: sessionStorage.getItem('token')}})
         .then(response => console.log("updated successfully"))
         .catch(err => {
             setFreq(oldfreq);
