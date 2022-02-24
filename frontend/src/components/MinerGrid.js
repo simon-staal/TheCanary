@@ -23,7 +23,10 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Miners() {
     const [miners, setMiners] = React.useState([]);
     let xs = 2
-    if(miners.length<=4){
+    if(miners.length==1){
+        xs = 12;
+    }
+    else if(miners.length<=4){
       xs = 6;
     }
     else if(miners.length<=8){
