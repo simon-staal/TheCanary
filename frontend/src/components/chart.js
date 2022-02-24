@@ -51,7 +51,6 @@ ChartJS.register(
         type: 'time',
         time: {
           unit: 'minute',
-          parser: 'YYYY-MM-DDTHH:mm:ssZ',
           tooltipFormat: 'll HH:mm',
           displayFormats: {
             millisecond: 'MMM DD',
