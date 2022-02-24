@@ -8,10 +8,10 @@ import CustomChart from './chart'
 export default function chartGrid (props){
     const chartInfos = 
     [
-    {color: 'yellow', label: 'Air pressure', route: '/graph'},
-    {color: 'red', label: 'CO2', route: '/graph'},
-    {color: 'green', label: 'Temperature', route: '/graph'},
-    {color: 'blue', label: 'Humidity', route: '/graph'}
+    {color: 'yellow', label: 'Air pressure', route: '/Pressure'},
+    {color: 'red', label: 'CO2', route: '/CO2'},
+    {color: 'green', label: 'Temperature', route: '/Temperature'},
+    {color: 'blue', label: 'Humidity', route: '/Humidity'}
     ]
     return (
         <Box>

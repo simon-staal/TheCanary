@@ -108,6 +108,79 @@ app.get("/graph", (req, res) => {
     })
 });
 
+//front-end requesting historical data for one miner
+app.get("/CO2", (req, res) => {
+    authenticateThenDo(req, res, async () => {
+        const minerId = req.query?.id;
+        if(minerId) {
+            try {
+                const data = await getHistoricalData(minerId, CO2)
+                res.send(data)
+            } catch (err) {
+                console.log(err)
+                res.status(500).send(err)
+            }
+        }
+        else {
+            res.status(500).send({ error: 'No id(ea) provided' })
+        }
+    })
+});
+
+//front-end requesting historical data for one miner
+app.get("/Pressure", (req, res) => {
+    authenticateThenDo(req, res, async () => {
+        const minerId = req.query?.id;
+        if(minerId) {
+            try {
+                const data = await getHistoricalData(minerId, Pressure)
+                res.send(data)
+            } catch (err) {
+                console.log(err)
+                res.status(500).send(err)
+            }
+        }
+        else {
+            res.status(500).send({ error: 'No id(ea) provided' })
+        }
+    })
+});
+//front-end requesting historical data for one miner
+app.get("/Temperature", (req, res) => {
+    authenticateThenDo(req, res, async () => {
+        const minerId = req.query?.id;
+        if(minerId) {
+            try {
+                const data = await getHistoricalData(minerId, Temperature)
+                res.send(data)
+            } catch (err) {
+                console.log(err)
+                res.status(500).send(err)
+            }
+        }
+        else {
+            res.status(500).send({ error: 'No id(ea) provided' })
+        }
+    })
+});
+app.get("/Humidity", (req, res) => {
+    authenticateThenDo(req, res, async () => {
+        const minerId = req.query?.id;
+        if(minerId) {
+            try {
+                const data = await getHistoricalData(minerId, Humidity)
+                res.send(data)
+            } catch (err) {
+                console.log(err)
+                res.status(500).send(err)
+            }
+        }
+        else {
+            res.status(500).send({ error: 'No id(ea) provided' })
+        }
+    })
+});
+
 //front-end updating sampling frequency
 //need to send it down to each pi
 app.post('/freq', (req, res)=>{
@@ -210,13 +283,13 @@ async function getMiners() {
     return result;
 }
 
-async function getHistoricalData(id) {
+async function getHistoricalData(id, key) {
     var query = {id: id};
     let y = [];
     let x = [];
     let result = await db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray()
     result.map((elem) => {
-        y.push(elem.data);
+        y.push(elem.data[key]);
         x.push(elem.time.getTime());
     })
     return {x: x, y: y}
