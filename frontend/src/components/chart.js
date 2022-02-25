@@ -1,6 +1,7 @@
 import React from 'react';
 import {Chart as ChartJS,TimeScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend} from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import "chartjs-adapter-moment";
 import axios from 'axios';
 
 ChartJS.register(
