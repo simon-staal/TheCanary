@@ -6,6 +6,7 @@ import smbus2
 import time
 import paho.mqtt.client as mqtt
 import DataProcessing as Data
+from DataProcessing import Data
 import numpy as np
 import json
 
@@ -14,75 +15,69 @@ CanaryId = "noId"
 #set up sensors - i2c connections + mqtt
 def initSensors():
     bus = smbus2.SMBus(1)
+    time.sleep(1)
     airQualitySensor = ccs811.SENSOR(bus)
     tempHumiditySensor = Si7021.SENSOR(bus)
     airPressureSensor = bmp280.Sensor(bus)
 
-    co2Data = Data.Data(airQualitySensor, airQualitySensor.getco2())
-    tempData = Data.Data(tempHumiditySensor, tempHumiditySensor.getTemp())
-    humidityData = Data.Data(tempHumiditySensor, tempHumiditySensor.getHumid())
-    airPressureData = Data.Data(airPressureSensor, airPressureSensor.pressure)
+    time.sleep(2)
 
-    for item in {co2Data, tempData, humidityData, airPressureData}:
-        item.last20val = np.full_like(np.arange(6, dtype=float), item.getReading())
+    co2Data = Data("CO2", airQualitySensor.getco2)
+    tempData = Data("Temperature", tempHumiditySensor.getTemp)
+    humidityData = Data("Humidity", tempHumiditySensor.getHumid)
+    airPressureData = Data("Pressure", airPressureSensor.pressure)
+    time.sleep(1)
+    tvocData = Data("TVOC", airQualitySensor.getTvoc)
 
-    return co2Data, tempData, humidityData, airPressureData
-
-def shutDown():
-    #might put other stuff here
-    print("Ending Program")
-    exit()
+    return co2Data, tempData, humidityData, airPressureData, tvocData
 
 def onMessage(client, userdata, message):
     msg = json.loads(message.payload.decode("utf-8"))
-    # if(msg is "end"):## just placeholeder atm
-    #     shutDown()
-    print("Received message:{} on topic {}".format(str(message.payload.decode("utf-8")), message.topic))
+    print("Received message:{} on topic {}".format(str(msg), message.topic))
 
 def onConnect(client, userdata, flags, rc):
     print("Connected")
-    client.subscribe("getId/w/e")
-    if CanaryId == "noId":
-        client.publish("send connection msg", "hi i connected and have no id give me id")
-    else:
-        client.publish("send my id","hi my id is " + CanaryId)
+    client.subscribe("test/#")
+    client.subscribe("sensor/instructions/#")
     
 
 def initMQTT(): 
     client = mqtt.Client()
     client.on_message = onMessage
     client.on_connect = onConnect
-    client.tls_set(ca_certs="mosquitto.org.crt",\
-                certfile="/MQTT/client.crt",\
-                keyfile="/MQTT/client.key")
+    client.tls_set(ca_certs='AWS/cert/ca.crt', certfile='AWS/cert/pi.crt', keyfile='AWS/cert/pi.key')
+    client.username_pw_set('sensor', '2Q7!#fXb6zcaU*DY')
 
-    returnCode = client.connect("test.mosquitto.org",port=8884)
+    returnCode = client.connect("thecanary.duckdns.org", 8883, 60)
     print(f"connect status: {mqtt.error_string(returnCode)}\n")
     time.sleep(1)
-    print("Subscribing to topic","IC.embedded/TeamEpicGamers/#")
-    client.subscribe("IC.embedded/TeamEpicGamers/test")
-
-    # MsgInfo = client.publish("IC.embedded/TeamEpicGamers/test","hello")
-    # print("...")
-    # print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
 
     return client
 
-def sendInfo(msg, client):
-    MsgInfo = client.publish("sensor/", msg)
+def sendInfo(data, client):
+    ID = {"id":CanaryId}
+    msg = ID.update({"data": data})
+    print("sending to server: ", msg)
+    MsgInfo = client.publish("sensor/data", json.dumps(msg))
     print("...")
     print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
 
 def main():
-    
-    co2, temp, humidity, airPresssure = initSensors()
+    print("start of main")
+    co2, temp, humidity, airPresssure, tvoc = initSensors()
+    print("mqtt")
     client = initMQTT()
     
-    while(1): # placeholder gonna figure out different sensor pollrates 
-        for i in {co2, temp, humidity, airPresssure}:
-            sendInfo(i.getData(), client)
-            time.sleep(i.pollRate())
-
+    while(1): # placeholder gonna figure out different sensor pollrates
+        data = {}
+        client.loop()
+        for i in {co2, temp, humidity, airPresssure, tvoc}:
+            reading = i.oneReading()
+            print("measured data", reading)
+            data.update(reading)
+        print("data: ", data)
+        sendInfo(data, client)
+        time.sleep(co2.pollRate)
 
     
     

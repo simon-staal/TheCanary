@@ -27,6 +27,9 @@ class Data():
     def getReading(self):
         return self.getDataReading()
 
+    def oneReading(self):
+        return {self.sensor: self.getReading()}
+
     def setDefaultPollingRate(self, pollRate):
         self.defaultPollingRate = pollRate
 
@@ -47,8 +50,8 @@ class Data():
    
     def processData(self):
         self.lastReading = self.getReading()
-        self.last20Val = self.last20Val[1:]
-        np.append(self.last20Val, self.lastReading)
+        self.last20Val = np.delete(self.last20Val, 0)
+        self.last20Val = np.append(self.last20Val, self.lastReading)
         self.findAvgVal()
         self.checkSafety()
         return
@@ -68,5 +71,5 @@ class Data():
 
     def getData(self):
         self.processData()
-        return json.dumps({"Sensor":self.sensor, "Latest Reading":self.lastReading, "Average Value":self.avgVal, "Danger Level":self.dangerLevel})
+        return {"Sensor":self.sensor, "Latest Reading":self.lastReading, "Average Value":self.avgVal, "Danger Level":self.dangerLevel}
 

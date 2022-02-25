@@ -20,6 +20,8 @@ class SENSOR_REGISTERS():
     # Temperature / humidity data can be written to enable compensation
     ENV_DATA = 0x05 # W
 
+    RESET = 0xFF
+
     # Error source location
     ERROR_ID = 0xE0 # R
 
@@ -38,7 +40,8 @@ class SENSOR():
         self.bus = bus
         self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
         self.mode = self.bus.read_byte_data(self.ADDR, self.REGS.MODE)
-        self.printStatus()
+        self.data = []
+        self.initStatus()
         self.printMode()
 
     def getStatus(self):
@@ -49,6 +52,16 @@ class SENSOR():
     def startApp(self):
         self.bus.write_i2c_block_data(self.ADDR, self.REGS.APP_START, [])
     
+    def initStatus(self):
+        print("Sensor Initialisation")
+        status = self.status
+        FW_MODE = getBit(status, 7)
+        if FW_MODE != 0:
+            print("resetting sensor")
+            self.bus.write_i2c_block_data(self.ADDR, self.REGS.RESET, [0x11, 0xE5, 0x72, 0x8A])          
+        self.printStatus()
+
+
     def printStatus(self):
         print("==== SENSOR STATUS ====")
         status = self.status
@@ -143,9 +156,17 @@ class SENSOR():
                 "rawData": data[6:]}
     
     def getco2(self):
-        data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
-        co2 = data[0:2]
+        if self.newData():
+            self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+
+        co2 = self.data[0:2]
         return int.from_bytes(bytes(co2), 'big', signed=False)
+
+    def getTvoc(self):
+        if self.newData():
+            self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+        tvoc = self.data[2:4]
+        return int.from_bytes(bytes(tvoc), 'big', signed=False)
 
     def setEnv(self, env):
         # Packet we will send

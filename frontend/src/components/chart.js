@@ -4,7 +4,7 @@ import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 
 ChartJS.register(
-  TimeScale,
+    TimeScale,
     LinearScale,
     PointElement,
     LineElement,
@@ -72,6 +72,7 @@ ChartJS.register(
   export default function CustomChart(props) {
     const [xVal, setXVal] = React.useState([]);
     const [yVal, setYVal] = React.useState([]);
+
     let data = {
       labels: xVal,
       datasets: [
