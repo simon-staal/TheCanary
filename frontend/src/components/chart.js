@@ -93,6 +93,8 @@ ChartJS.register(
           setYVal(res.data.y);
           data.labels=res.data.x;
           data.datasets[0].data=res.data.y;
+          console.log(xVal)
+          console.log(yVal)
         })
         .catch(err => {
           console.log(err);
