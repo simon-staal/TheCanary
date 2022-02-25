@@ -1,17 +1,15 @@
 import React from 'react';
-import {Chart as ChartJS,CategoryScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale} from 'chart.js';
+import {Chart as ChartJS,TimeScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale} from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 
 ChartJS.register(
-    CategoryScale,
+  TimeScale,
     LinearScale,
     PointElement,
     LineElement,
     Title,
     Tooltip,
-    Legend,
-    TimeScale,
   );
 
   export var options = {
@@ -47,23 +45,10 @@ ChartJS.register(
           }
         }
       },
-      xAxes: [{
+      x: {
         type: 'time',
-        parsing: 'false',
         time: {
-          unit: 'minute',
-          tooltipFormat: 'll HH:mm',
-          displayFormats: {
-            millisecond: 'MMM DD',
-            second: 'MMM DD',
-            minute: 'MMM DD',
-            hour: 'MMM DD',
-            day: 'MMM DD',
-            week: 'MMM DD',
-            month: 'MMM DD',
-            quarter: 'MMM DD',
-            year: 'MMM DD',
-          }
+        	unit: 'minute',
         },
         ticks: {
           color: "white",
@@ -74,12 +59,12 @@ ChartJS.register(
         title: {
           color: "white",
           display: true,
-          text: 'Name X',
+          text: 'Time',
           font: {
             size: 14,
           }
         }
-      }],
+      },
     },
   };
   
