@@ -2,6 +2,8 @@ import React from 'react';
 import {Chart as ChartJS,CategoryScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale} from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
+import 'chartjs-adapter-moment';
+import moment from 'moment';
 
 ChartJS.register(
     CategoryScale,
@@ -48,11 +50,11 @@ ChartJS.register(
         }
       },
       xAxes: [{
-        type: 'time',
-        parsing: 'false',
+        type: 'day',
+        gridLines: {
+          lineWidth: 2
+        },
         time: {
-          unit: 'minute',
-          tooltipFormat: 'll HH:mm',
           displayFormats: {
             millisecond: 'MMM DD',
             second: 'MMM DD',
@@ -87,6 +89,7 @@ ChartJS.register(
   export default function CustomChart(props) {
     const [xVal, setXVal] = React.useState([]);
     const [yVal, setYVal] = React.useState([]);
+
     let data = {
       labels: xVal,
       datasets: [
@@ -103,9 +106,13 @@ ChartJS.register(
     React.useEffect(() => {
       axios.get(process.env.REACT_APP_DOMAIN + props.chartdata.route, { params: { id: props.id, token: sessionStorage.getItem('token')} })
         .then(res => {
-          setXVal(res.data.x);
+          let Xvalues = [];
+          res.data.x.map((mseconds=>{
+            Xvalues.push(moment(mseconds));
+          }))
+          setXVal(Xvalues);
           setYVal(res.data.y);
-          data.labels=res.data.x;
+          data.labels=Xvalues;
           data.datasets[0].data=res.data.y;
         })
         .catch(err => {
