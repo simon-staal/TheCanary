@@ -147,6 +147,11 @@ class SENSOR():
         co2 = data[0:2]
         return int.from_bytes(bytes(co2), 'big', signed=False)
 
+    def getTvoc(self):
+        data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+        tvoc = data[2:4]
+        return int.from_bytes(bytes(tvoc), 'big', signed=False)
+
     def setEnv(self, env):
         # Packet we will send
         newEnv = [0, 0, 0, 0]

@@ -9,7 +9,7 @@ from DataProcessing import Data
 import numpy as np
 import json
 
-CanaryId = "noId"
+CanaryId = "Canary1"
 
 #set up sensors - i2c connections + mqtt
 def initSensors():
@@ -30,8 +30,6 @@ def initSensors():
 
     #tempData.last20val = np.full_like(np.arange(6, dtype=float), tempData.getReading())
     #humidityData.last20val = np.full_like(np.arange(6, dtype=float), humidityData.getReading())    
-
-    print("getting reading ", humidityData.getReading())
 
     return tempData, humidityData
 
