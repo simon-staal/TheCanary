@@ -271,7 +271,7 @@ const pubOptions={
 function publish(topic,msg,options=pubOptions){
 	console.log("publishing",msg);
 	if (MQTTclient.connected == true){
-		MQTTclient.publish(topic,msg,options);
+		MQTTclient.publish(topic,msg.toString(),options);
 	}
 }
 
