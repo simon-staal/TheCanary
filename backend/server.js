@@ -325,6 +325,7 @@ function addNewData(id, data) {
                 data:averageWindow.id.data,
                 time: new Date((insertion.time.getTime() + averageWindow.id.time.getTime())/2)
             }
+            console.log(`Averaged insertion:\n${averageInsertion}`)
             // Reset average window
             averageWindow.id.data = data;
             averageWindow.id.time = insertion.time;
