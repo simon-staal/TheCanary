@@ -187,6 +187,15 @@ app.get('/archive', (req, res)=> {
     })
 });
 
+//front-end updating sampling frequency
+//need to send it down to each pi
+app.post('/freq', (req, res)=>{
+    authenticateThenDo(req, res, () => {
+        publish('sensor/instructions/sampling', req.body.global);
+        res.send('OK');
+    })
+});
+
 app.get('/deleteMiner', (req, res)=> {
     authenticateThenDo(req, res, ()=>{
         const minerId = req.query?.id;
@@ -201,15 +210,6 @@ app.get('/deleteMiner', (req, res)=> {
         }
     })
 })
-
-//front-end updating sampling frequency
-//need to send it down to each pi
-app.post('/freq', (req, res)=>{
-    authenticateThenDo(req, res, () => {
-        publish('sensor/instructions/sampling', req.body.global);
-        res.send('OK');
-    })
-});
 
 // Handles any other routes
 app.use((req, res, next) => {
@@ -302,10 +302,10 @@ async function getMiners() {
     result.sort((a, b) => {
         if (a.danger === b.danger) a.id - b.id
         a.danger - b.danger
-    })
+    });
     result.forEach((item, index) => {
         delete item.danger
-    })
+    });
     return result;
 }
 
@@ -332,21 +332,21 @@ function addNewData(id, data) {
     var query = {id: id};
     var insertion = {id:id, data:data,time: new Date()}
     //delete data for this id form database
-    if(averageWindow.id !== undefined) {
-        if(insertion.time.getTime() - averageWindow.id.time.getTime() > 60000) {
+    if(averageWindow[id] !== undefined) {
+        if(insertion.time.getTime() - averageWindow[id].time.getTime() > 60000) {
             // Inserts into graph data
-            for (const [key, value] of Object.entries(averageWindow.id.data)) {
-                averageWindow.id.data[key] = value / averageWindow.id.count;
+            for (const [key, value] of Object.entries(averageWindow[id].data)) {
+                averageWindow[id].data[key] = value / averageWindow[id].count;
             }
             averageInsertion = {
                 id:id,
-                data:averageWindow.id.data,
-                time: new Date((insertion.time.getTime() + averageWindow.id.time.getTime())/2)
+                data:averageWindow[id].data,
+                time: new Date((insertion.time.getTime() + averageWindow[id].time.getTime())/2)
             }
             // Reset average window
-            averageWindow.id.data = data;
-            averageWindow.id.time = insertion.time;
-            averageWindow.id.count = 1;
+            averageWindow[id].data = data;
+            averageWindow[id].time = insertion.time;
+            averageWindow[id].count = 1;
             db.collection(oldDataColl).insertOne(averageInsertion, function(err, res) {
                 if (err){
                     console.log(err);
@@ -355,14 +355,14 @@ function addNewData(id, data) {
             });
         }
         else {
-            averageWindow.id.count += 1;
-            for (const [key, value] of Object.entries(averageWindow.id.data)) {
-                averageWindow.id.data[key] += data[key];
+            averageWindow[id].count += 1;
+            for (const [key, value] of Object.entries(averageWindow[id].data)) {
+                averageWindow[id].data[key] += data[key];
             }
         }
     }
     else { // First time we see id
-        averageWindow.id = {
+        averageWindow[id] = {
             data: data,
             time: insertion.time,
             count: 1
