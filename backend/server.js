@@ -317,6 +317,7 @@ function addNewData(id, data) {
             for (const [key, value] of Object.entries(averageWindow.id.data)) {
                 averageWindow.id.data[key] = value / averageWindow.id.count;
             }
+            console.log(averageWindow.id)
             averageInsertion = {
                 id:id,
                 data:averageWindow.id.data,
