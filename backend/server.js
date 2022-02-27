@@ -27,6 +27,7 @@ const httpsServer = https.createServer(SSL_options, app);
 
 //Initialise MongoDB database
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const mongoose = require('mongoose'); // Used to transfer data
 
 const uri = "mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const oldDataColl = "HistoricalData";
@@ -65,7 +66,6 @@ const privateKey = fs.readFileSync('../AWS/cert/webapp.key')
 // If successful this returns a session token to be included as part of the query parameters for all subsequent endpoint calls
 app.post('/login', (req, res) => {
     // Purely for demonstrative purposes, if we had actual users we would store users + password hashes in a database, and compare to those
-    console.log(req.body)
     if (req.body.username === 'admin' && req.body.password === "password") {
         let token = jwt.sign({ token: 'poggers'}, privateKey);
         res.send({token: token});
@@ -80,7 +80,6 @@ app.get("/miners", (req, res) => {
     authenticateThenDo(req, res, async () => {
         try {
             const miners = await getMiners()
-            console.log(miners)
             res.send({data: miners, units: {Humidity: '%', Temperature: '°C', Pressure: 'hPa', CO2: 'ppm', TVOC: 'ppb'}});
         } catch (err) {
             console.log(err)
@@ -114,6 +113,7 @@ app.get("/CO2", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
+                console.log(typeof minerId)
                 const data = await getHistoricalData(minerId, ["CO2", "TVOC"])
                 res.send(data)
             } catch (err) {
@@ -133,6 +133,7 @@ app.get("/Pressure", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
+                console.log(typeof minerId)
                 const data = await getHistoricalData(minerId, ["Pressure"])
                 res.send(data)
             } catch (err) {
@@ -151,6 +152,7 @@ app.get("/Temperature", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
+                console.log(typeof minerId)
                 const data = await getHistoricalData(minerId, ["Temperature"])
                 res.send(data)
             } catch (err) {
@@ -168,6 +170,7 @@ app.get("/Humidity", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
+                console.log(typeof minerId)
                 const data = await getHistoricalData(minerId, ["Humidity"])
                 res.send(data)
             } catch (err) {
@@ -205,7 +208,6 @@ app.use((req, res, next) => {
 /// If the request contains a valid token, process the request defined in function, else return an error
 function authenticateThenDo(req, res, fun) {
     let token = req.query.token;
-    console.log(token)
     jwt.verify(token, privateKey, (err, decoded) => {
         if(!err) {
             if(decoded.token === 'poggers') {
@@ -264,7 +266,6 @@ MQTTclient.on("error", error => {
 MQTTclient.on('message', (topic, message, packet) => {
 	if (topic === "sensor/data") {
         let msg = JSON.parse(message.toString())
-        console.log(msg);
         addNewData(msg.id, msg.data);
 	}
 })
