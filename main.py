@@ -55,8 +55,9 @@ def initMQTT():
     return client
 
 def sendInfo(data, client):
-    ID = {"id":CanaryId}
-    msg = ID.update({"data": data})
+    msg = {"id":CanaryId}
+    info = {"data": data}
+    msg.update(info)
     print("sending to server: ", msg)
     MsgInfo = client.publish("sensor/data", json.dumps(msg))
     print("...")

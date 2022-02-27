@@ -59,8 +59,8 @@ class SENSOR():
         if FW_MODE != 0:
             print("resetting sensor")
             self.bus.write_i2c_block_data(self.ADDR, self.REGS.RESET, [0x11, 0xE5, 0x72, 0x8A])          
-        self.printStatus()
-
+            sleep(0.15)
+        self.getStatus()
 
     def printStatus(self):
         print("==== SENSOR STATUS ====")
@@ -133,7 +133,7 @@ class SENSOR():
         if newMode != 0 and newMode != 4 and newMode > self.mode:
             print("WARNING: When going to a lower sampling rate, sensor should be set to idle for at least 10 minutes")
             print("WARNING: Setting new mode to 0")
-            newMode = 0
+            newMode = 1
         DRIVE_MODE = "{0:03b}".format(newMode)
         assert interrupt == 0 or interrupt == 1, print(f"ERROR: INVALID INTERRUPT: {interrupt} (Please use 0 or 1 to disable / enable interrupt)")
         INT_DATARDY = "{0:01b}".format(interrupt)
@@ -156,15 +156,12 @@ class SENSOR():
                 "rawData": data[6:]}
     
     def getco2(self):
-        if self.newData():
-            self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
-
+        self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
         co2 = self.data[0:2]
         return int.from_bytes(bytes(co2), 'big', signed=False)
 
     def getTvoc(self):
-        if self.newData():
-            self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+        self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
         tvoc = self.data[2:4]
         return int.from_bytes(bytes(tvoc), 'big', signed=False)
 
