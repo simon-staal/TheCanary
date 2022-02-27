@@ -27,9 +27,6 @@ const httpsServer = https.createServer(SSL_options, app);
 
 //Initialise MongoDB database
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const mongoose = require('mongoose'); // Used to transfer data
-// Importing models from model.js
-const { Source, Destination } = require('./model');
 
 const uri = "mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const oldDataColl = "HistoricalData";
@@ -38,15 +35,6 @@ const archiveColl = "Archive"
 
 const DBClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 var db;
-
-// Connecting to database
-mongoose.connect('mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-        useCreateIndex: true
-    });
 
 // Initialize connection once
 DBClient.connect((err) => {
