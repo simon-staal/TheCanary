@@ -316,6 +316,8 @@ function addNewData(id, data) {
             // Inserts into graph data
             for (const [key, value] of Object.entries(averageWindow.id.data)) {
                 averageWindow.id.data[key] = value / averageWindow.id.count;
+                console.log(`Current process: ${key}: ${value}`)
+                console.log(averageWindow.id.data[key])
             }
             console.log(averageWindow.id)
             averageInsertion = {
