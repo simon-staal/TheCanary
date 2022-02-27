@@ -319,13 +319,13 @@ function addNewData(id, data) {
                 console.log(`Current process: ${key}: ${value}`)
                 console.log(averageWindow.id.data[key])
             }
-            console.log(averageWindow.id)
+            console.log(JSON.stringify(averageWindow.id))
             averageInsertion = {
                 id:id,
                 data:averageWindow.id.data,
                 time: new Date((insertion.time.getTime() + averageWindow.id.time.getTime())/2)
             }
-            console.log(`Averaged insertion:\n${averageInsertion}`)
+            console.log(`Averaged insertion:\n${JSON.stringify(averageInsertion)}`)
             // Reset average window
             averageWindow.id.data = data;
             averageWindow.id.time = insertion.time;
@@ -340,7 +340,7 @@ function addNewData(id, data) {
         else {
             averageWindow.id.count += 1;
             for (const [key, value] of Object.entries(averageWindow.id.data)) {
-                averageWindow.id.data[key] += value;
+                averageWindow.id.data[key] += data[key];
             }
         }
     }
