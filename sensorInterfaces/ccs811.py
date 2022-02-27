@@ -20,6 +20,8 @@ class SENSOR_REGISTERS():
     # Temperature / humidity data can be written to enable compensation
     ENV_DATA = 0x05 # W
 
+    RESET = 0xFF
+
     # Error source location
     ERROR_ID = 0xE0 # R
 
@@ -39,7 +41,7 @@ class SENSOR():
         self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
         self.mode = self.bus.read_byte_data(self.ADDR, self.REGS.MODE)
         self.data = []
-        self.printStatus()
+        self.initStatus()
         self.printMode()
 
     def getStatus(self):
@@ -50,6 +52,16 @@ class SENSOR():
     def startApp(self):
         self.bus.write_i2c_block_data(self.ADDR, self.REGS.APP_START, [])
     
+    def initStatus(self):
+        print("Sensor Initialisation")
+        status = self.status
+        FW_MODE = getBit(status, 7)
+        if FW_MODE != 0:
+            print("resetting sensor")
+            self.bus.write_i2c_block_data(self.ADDR, self.REGS.RESET, [0x11, 0xE5, 0x72, 0x8A])          
+        self.printStatus()
+
+
     def printStatus(self):
         print("==== SENSOR STATUS ====")
         status = self.status
