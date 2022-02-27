@@ -196,9 +196,9 @@ app.post('/freq', (req, res)=>{
     })
 });
 
-app.get('/deleteMiner', (req, res)=> {
+app.delete('/deleteMiner', (req, res)=> {
     authenticateThenDo(req, res, ()=>{
-        const minerId = req.query?.id;
+        const minerId = req.body?.id;
         if(minerId) {
             var query = {id: minerId};
             db.collection(oldDataColl).deleteMany(query);
