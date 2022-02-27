@@ -25,13 +25,15 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:last-child td, &:last-child th': {
       border: 0,
     },
+    
   }));
 
 
 export default function MinerTable(props) {
     return(
-        <TableContainer component={Paper}>
+        <TableContainer sx={{backgroundColor:'rgba(52, 52, 52, 0.8)'}}component={Paper}>
         <Table 
+            size='medium'
             sx=
                 {{ minWidth: 200, [`& .${tableCellClasses.root}`]: {borderBottom: "none", backgroundColor:'rgba(52, 52, 52, 0.8)'}
   }} aria-label="simple table">

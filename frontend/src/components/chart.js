@@ -136,7 +136,6 @@ ChartJS.register(
     } 
     React.useEffect(() => {      
       getNewData();
-      console.log(props.chartdata.label);
       let currOptions = options
       currOptions.scales.y.title.text = props.chartdata.label[0];
       if (props.chartdata.label.length >1){

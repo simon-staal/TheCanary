@@ -32,6 +32,9 @@ export const theme = createTheme({
     tablebackground: {
       even: '#2F2F2F',
       odd: '#3F3F3F',
+    },
+    appbar: {
+      main: '#434341',
     }
   },
   overrides: {

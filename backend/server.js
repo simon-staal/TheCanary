@@ -187,6 +187,21 @@ app.get('/archive', (req, res)=> {
     })
 });
 
+app.get('/deleteMiner', (req, res)=> {
+    authenticateThenDo(req, res, ()=>{
+        const minerId = req.query?.id;
+        if(minerId) {
+            var query = {id: minerId};
+            db.collection(oldDataColl).deleteMany(query);
+            db.collection(currDataColl).deleteMany(query);
+            res.send('OK');
+        }
+        else {
+            res.status(500).send({ error: 'No id(ea) provided' })
+        }
+    })
+})
+
 //front-end updating sampling frequency
 //need to send it down to each pi
 app.post('/freq', (req, res)=>{

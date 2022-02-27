@@ -68,6 +68,18 @@ const StyledMenu = styled((props) => (
   },
 }));
 
+const StyledAvatar = styled(Avatar)(({theme})=>({
+  '&.MuiAvatar-root':{
+    backgroundColor: theme.palette.primary.main,
+  }
+}));
+
+const StyledSettingsIcon = styled(SettingsIcon)(({theme})=>({
+    '&&&': {
+      color: theme.palette.appbar.main,
+    },
+}));
+
 
 const ResponsiveAppBar = ({setToken}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -101,7 +113,7 @@ const ResponsiveAppBar = ({setToken}) => {
     setToken(undefined);
   }
   return (
-    <AppBar style = {{background: '#434341'}} position="static">
+    <AppBar style = {{background: '#434341'}} position="sticky">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -176,15 +188,26 @@ const ResponsiveAppBar = ({setToken}) => {
                 {page}
               </Button>
             ))}
+            {
+              <Button
+                key="websiteLink"
+                onClick={handleCloseNavMenu}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+                href="https://kc31949.wixsite.com/the-canary"
+                sx= {{fontSize:'25px'}}
+              >
+                Info
+              </Button>
+            }
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar>
-                  <SettingsIcon sx={{ color: 'white' }} alt="Settings" color='white' />
-                </Avatar>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0}}>
+                <StyledAvatar >
+                  <StyledSettingsIcon  alt="Settings" />
+                </StyledAvatar>
               </IconButton>
               
             </Tooltip>
