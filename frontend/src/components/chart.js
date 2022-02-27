@@ -1,19 +1,15 @@
 import React from 'react';
-import {Chart as ChartJS,CategoryScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale} from 'chart.js';
+import {Chart as ChartJS,TimeScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale} from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
-import 'chartjs-adapter-moment';
-import moment from 'moment';
 
 ChartJS.register(
-    CategoryScale,
+    TimeScale,
     LinearScale,
     PointElement,
     LineElement,
     Title,
     Tooltip,
-    Legend,
-    TimeScale,
   );
 
   export var options = {
@@ -49,23 +45,10 @@ ChartJS.register(
           }
         }
       },
-      xAxes: [{
-        type: 'day',
-        gridLines: {
-          lineWidth: 2
-        },
+      x: {
+        type: 'time',
         time: {
-          displayFormats: {
-            millisecond: 'MMM DD',
-            second: 'MMM DD',
-            minute: 'MMM DD',
-            hour: 'MMM DD',
-            day: 'MMM DD',
-            week: 'MMM DD',
-            month: 'MMM DD',
-            quarter: 'MMM DD',
-            year: 'MMM DD',
-          }
+        	unit: 'minute',
         },
         ticks: {
           color: "white",
@@ -76,12 +59,12 @@ ChartJS.register(
         title: {
           color: "white",
           display: true,
-          text: 'Name X',
+          text: 'Time',
           font: {
             size: 14,
           }
         }
-      }],
+      },
     },
   };
   
@@ -106,13 +89,9 @@ ChartJS.register(
     React.useEffect(() => {
       axios.get(process.env.REACT_APP_DOMAIN + props.chartdata.route, { params: { id: props.id, token: sessionStorage.getItem('token')} })
         .then(res => {
-          let Xvalues = [];
-          res.data.x.map((mseconds=>{
-            Xvalues.push(moment(mseconds));
-          }))
-          setXVal(Xvalues);
+          setXVal(res.data.x);
           setYVal(res.data.y);
-          data.labels=Xvalues;
+          data.labels=res.data.x;
           data.datasets[0].data=res.data.y;
         })
         .catch(err => {
