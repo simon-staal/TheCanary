@@ -300,8 +300,11 @@ function publish(topic,msg,options=pubOptions){
 async function getMiners() {
     let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray()
     result.sort((a, b) => {
-        if (a.danger === b.danger) a.id - b.id
-        a.danger - b.danger
+        if (a.danger === b.danger) {
+            return a.id - b.id;
+        }
+        console.log(`Danger A: ${a.danger}, Danger B: ${b.danger}`);
+        return a.danger - b.danger;
     });
     result.forEach((item, index) => {
         delete item.danger
