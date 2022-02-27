@@ -18,20 +18,22 @@ def initSensors():
     airQualitySensor = ccs811.SENSOR(bus)
     tempHumiditySensor = Si7021.SENSOR(bus)
     airPressureSensor = bmp280.Sensor(bus)
+    airPressureSensor.mode = bmp280.NORMAL_MODE
+
+    time.sleep(2)
 
     co2Data = Data("CO2", airQualitySensor.getco2)
     tempData = Data("Temperature", tempHumiditySensor.getTemp)
     humidityData = Data("Humidity", tempHumiditySensor.getHumid)
     airPressureData = Data("Pressure", airPressureSensor.pressure)
+    time.sleep(1)
     tvocData = Data("TVOC", airQualitySensor.getTvoc)
 
     return co2Data, tempData, humidityData, airPressureData, tvocData
 
 def onMessage(client, userdata, message):
     msg = json.loads(message.payload.decode("utf-8"))
-    # if(msg is "end"):## just placeholeder atm
-    #     shutDown()
-    print("Received message:{} on topic {}".format(str(message.payload.decode("utf-8")), message.topic))
+    print("Received message:{} on topic {}".format(str(msg), message.topic))
 
 def onConnect(client, userdata, flags, rc):
     print("Connected")
