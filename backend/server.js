@@ -28,13 +28,25 @@ const httpsServer = https.createServer(SSL_options, app);
 //Initialise MongoDB database
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const mongoose = require('mongoose'); // Used to transfer data
+// Importing models from model.js
+const { Source, Destination } = require('./model');
 
 const uri = "mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const oldDataColl = "HistoricalData";
 const currDataColl = "CurrentData";
+const archiveColl = "Archive"
 
 const DBClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 var db;
+
+// Connecting to database
+mongoose.connect('mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
+    });
 
 // Initialize connection once
 DBClient.connect((err) => {
@@ -182,7 +194,7 @@ app.get("/Humidity", (req, res) => {
 
 app.get('/archive', (req, res)=> {
     authenticateThenDo(req, res, ()=>{
-        db.collection(oldDataColl).deleteMany({});
+        db.collection(oldDataColl).deleteMany({}); // Empties the graph data (data is already stored in archive)
         res.send('OK');
     })
 });
@@ -304,9 +316,49 @@ async function getHistoricalData(id, keyArray) {
     return {x: x, data: data}
 }
 
+let averageWindow = {}
+
 function addNewData(id, data) {
     var query = {id: id};
+    var insertion = {id:id, data:data,time: new Date()}
     //delete data for this id form database
+    if(averageWindow.id !== undefined) {
+        if(insertion.time.getTime() - averageWindow.id.time.getTime() > 60000) {
+            // Inserts into graph data
+            for (const [key, value] of Object.entries(averageWindow.id.data)) {
+                averageWindow.id.data[key] = value / averageWindow.id.count;
+            }
+            averageInsertion = {
+                id:id,
+                data:averageWindow.id.data,
+                time: new Date((insertion.time.getTime() + averageWindow.id.time.getTime())/2)
+            }
+            // Reset average window
+            averageWindow.id.data = data;
+            averageWindow.id.time = insertion.time;
+            averageWindow.id.count = 1;
+            db.collection(oldDataColl).insertOne(averageInsertion, function(err, res) {
+                if (err){
+                    console.log(err);
+                    throw err;
+                }
+            });
+        }
+        else {
+            averageWindow.id.count += 1;
+            for (const [key, value] of Object.entries(averageWindow.id.data)) {
+                averageWindow.id.data[key] += value;
+            }
+        }
+    }
+    else { // First time we see id
+        averageWindow.id = {
+            data: data,
+            time: insertion.time,
+            count: 1
+        }
+    }
+
     db.collection(currDataColl).deleteMany(query,(err, obj) => {
         if (err){
             console.log(err);
@@ -314,7 +366,7 @@ function addNewData(id, data) {
         }
         else {
             //console.log(obj.result.n + " document(s) deleted");
-            db.collection(currDataColl).insertOne({id:id, data:data,time: new Date()}, function(err, res) {
+            db.collection(currDataColl).insertOne(insertion, function(err, res) {
                 if (err){
                     console.log(err);
                     throw err;
@@ -322,7 +374,8 @@ function addNewData(id, data) {
             }); 
         }
     });
-    db.collection(oldDataColl).insertOne({id:id, data:data,time: new Date()}, function(err, res) {
+
+    db.collection(archiveColl).insertOne(insertion, function(err, res) {
         if (err){
             console.log(err);
             throw err;
