@@ -15,10 +15,10 @@ CanaryId = "noId"
 #set up sensors - i2c connections + mqtt
 def initSensors():
     bus = smbus2.SMBus(1)
+    time.sleep(1)
     airQualitySensor = ccs811.SENSOR(bus)
     tempHumiditySensor = Si7021.SENSOR(bus)
     airPressureSensor = bmp280.Sensor(bus)
-    airPressureSensor.mode = bmp280.NORMAL_MODE
 
     time.sleep(2)
 

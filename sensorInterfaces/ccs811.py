@@ -38,6 +38,7 @@ class SENSOR():
         self.bus = bus
         self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
         self.mode = self.bus.read_byte_data(self.ADDR, self.REGS.MODE)
+        self.data = 0
         self.printStatus()
         self.printMode()
 
@@ -143,13 +144,16 @@ class SENSOR():
                 "rawData": data[6:]}
     
     def getco2(self):
-        data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
-        co2 = data[0:2]
+        if self.newData():
+            self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+
+        co2 = self.data[0:2]
         return int.from_bytes(bytes(co2), 'big', signed=False)
 
     def getTvoc(self):
-        data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
-        tvoc = data[2:4]
+        if self.newData():
+            self.data = self.bus.read_i2c_block_data(self.ADDR, self.REGS.ALG_RESULT_DATA, 8)
+        tvoc = self.data[2:4]
         return int.from_bytes(bytes(tvoc), 'big', signed=False)
 
     def setEnv(self, env):
