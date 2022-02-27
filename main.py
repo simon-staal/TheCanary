@@ -18,7 +18,7 @@ RED = 22
 global timePeriod
 timePeriod = 5
 global CanaryId
-CanaryId = 1
+CanaryId = 0
 
 def initGPIO():
     GPIO.setmode(GPIO.BCM)
@@ -50,10 +50,9 @@ def initSensors():
 
 def onMessage(client, userdata, message):
     global timePeriod
-    msg = json.loads(message.payload.decode("utf-8"))
-    print("Received message:{} on topic {}".format(str(msg), message.topic))
+    print("Received message: {} on topic {}".format(str(message.payload.decode("utf-8")), message.topic))
     if message.topic == "sensor/instructions/sampling":
-        timePeriod = msg
+        timePeriod = int(message.payload.decode("utf-8"))
 
 def onConnect(client, userdata, flags, rc):
     print("Connected")
@@ -75,7 +74,7 @@ def initMQTT():
     return client
 
 def sendInfo(data, client):
-    msg = {"id":CanaryId}
+    msg = {"id":CanaryId+1}
     info = {"data": data}
     msg.update(info)
     print("sending to server: ", msg)
@@ -115,6 +114,8 @@ def main():
             dangerLevels.append(danger)
             data.update(reading)
         print("data: ", data)
+        if(data.get("TVOC") > 2000):
+            exit()
         sendInfo(data, client)
         setLEDs(dangerLevels)
         time.sleep(timePeriod)
