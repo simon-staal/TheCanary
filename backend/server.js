@@ -200,7 +200,7 @@ app.delete('/deleteMiner', (req, res)=> {
     authenticateThenDo(req, res, ()=>{
         const minerId = req.body?.id;
         if(minerId) {
-            var query = {id: minerId};
+            var query = {id: parseInt(minerId)};
             db.collection(oldDataColl).deleteMany(query);
             db.collection(currDataColl).deleteMany(query);
             res.send('OK');
