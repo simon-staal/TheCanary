@@ -38,7 +38,7 @@ class SENSOR():
         self.bus = bus
         self.status = self.bus.read_byte_data(self.ADDR, self.REGS.STATUS)
         self.mode = self.bus.read_byte_data(self.ADDR, self.REGS.MODE)
-        self.data = 0
+        self.data = []
         self.printStatus()
         self.printMode()
 

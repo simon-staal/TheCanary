@@ -55,7 +55,9 @@ def initMQTT():
     return client
 
 def sendInfo(data, client):
-    msg = {"id":CanaryId}.update({"data":data})
+    ID = {"id":CanaryId}
+    msg = ID.update({"data": data})
+    print("sending to server: ", msg)
     MsgInfo = client.publish("sensor/data", json.dumps(msg))
     print("...")
     print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
@@ -73,6 +75,7 @@ def main():
             reading = i.oneReading()
             print("measured data", reading)
             data.update(reading)
+        print("data: ", data)
         sendInfo(data, client)
         time.sleep(co2.pollRate)
 
