@@ -284,6 +284,7 @@ function publish(topic,msg,options=pubOptions){
 //gets the current miner data from the database and returns them in an array
 async function getMiners() {
     let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray()
+    result.sort((a, b) => a.id - b.id)
     return result;
 }
 
