@@ -62,7 +62,7 @@ function App() {
     <ThemeProvider theme={theme}>
     <div className="App">
       <header className="App-header">
-      <ResponsiveAppBar/>
+      <ResponsiveAppBar setToken= {setToken}/>
         <Miners/>
       </header>
     </div>
