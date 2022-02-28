@@ -190,7 +190,6 @@ class Sensor():
         return self._t_fine / 5120.0
 
     """Compensated pressure in hectoPascals (hPa)"""
-    @property
     def pressure(self):
         self._read_t_fine()
 
