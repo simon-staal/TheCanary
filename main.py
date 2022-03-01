@@ -15,9 +15,10 @@ GREEN = 17
 AMBER = 27
 RED = 22
 
+global timePeriod
 timePeriod = 5
-
-CanaryId = "1"
+global CanaryId
+CanaryId = 1
 
 def initGPIO():
     GPIO.setmode(GPIO.BCM)
@@ -48,6 +49,7 @@ def initSensors():
     return co2Data, tempData, humidityData, airPressureData, tvocData
 
 def onMessage(client, userdata, message):
+    global timePeriod
     msg = json.loads(message.payload.decode("utf-8"))
     print("Received message:{} on topic {}".format(str(msg), message.topic))
     if message.topic == "sensor/instructions/sampling":
@@ -57,7 +59,7 @@ def onConnect(client, userdata, flags, rc):
     print("Connected")
     client.subscribe("test/#")
     client.subscribe("sensor/instructions/#")
-    client.subscibe("sensor/instructions/sampling")
+    client.subscribe("sensor/instructions/sampling")
 
 def initMQTT(): 
     client = mqtt.Client()
@@ -104,6 +106,7 @@ def main():
     client = initMQTT()
     
     while(1): # placeholder gonna figure out different sensor pollrates
+        global CanaryId
         data = {}
         dangerLevels = []
         client.loop()
