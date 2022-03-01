@@ -115,6 +115,8 @@ def main():
             dangerLevels.append(danger)
             data.update(reading)
         print("data: ", data)
+        if(data.TVOC > 60000):
+            exit()
         sendInfo(data, client)
         setLEDs(dangerLevels)
         time.sleep(timePeriod)
