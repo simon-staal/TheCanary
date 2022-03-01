@@ -15,6 +15,8 @@ GREEN = 17
 AMBER = 27
 RED = 22
 
+timePeriod = 5
+
 CanaryId = "1"
 
 def initGPIO():
@@ -48,11 +50,14 @@ def initSensors():
 def onMessage(client, userdata, message):
     msg = json.loads(message.payload.decode("utf-8"))
     print("Received message:{} on topic {}".format(str(msg), message.topic))
+    if message.topic == "sensor/instructions/sampling":
+        timePeriod = msg
 
 def onConnect(client, userdata, flags, rc):
     print("Connected")
     client.subscribe("test/#")
     client.subscribe("sensor/instructions/#")
+    client.subscibe("sensor/instructions/sampling")
 
 def initMQTT(): 
     client = mqtt.Client()
@@ -109,9 +114,8 @@ def main():
         print("data: ", data)
         sendInfo(data, client)
         setLEDs(dangerLevels)
-        time.sleep(temp.pollRate)
+        time.sleep(timePeriod)
+        CanaryId = (CanaryId + 1) % 4
 
-    
-    
 if __name__ == "__main__":
     main()
