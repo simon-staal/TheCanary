@@ -50,7 +50,7 @@ def initSensors():
 
 def onMessage(client, userdata, message):
     global timePeriod
-    print("Received message:{} on topic {}".format(str(msg), message.topic))
+    print("Received message:{} on topic {}".format(str(message.payload.decode("utf-8")), message.topic))
     if message.topic == "sensor/instructions/sampling":
         timePeriod = message.payload.decode("utf-8")
 
