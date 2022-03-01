@@ -91,11 +91,11 @@ ChartJS.register(
       axios.get(process.env.REACT_APP_DOMAIN + props.chartdata.route, { params: { id: props.id, token: sessionStorage.getItem('token')} })
         .then(res => {
           setXVal(res.data.x);
-          setYVal(res.data.y);
+          setYVal(res.data.data);
           data.labels=res.data.x;
-          data.datasets[0].data=res.data.y;
-          console.log(xVal)
-          console.log(yVal)
+          Object.keys(res.data.data).map((key, index)=>{
+            data.datasets[index].data= res.data.data[key]
+          })
         })
         .catch(err => {
           console.log(err);
