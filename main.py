@@ -10,7 +10,7 @@ from DataProcessing import Data
 import numpy as np
 import json
 
-CanaryId = "noId"
+CanaryId = "1"
 
 #set up sensors - i2c connections + mqtt
 def initSensors():
