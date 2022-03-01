@@ -13,91 +13,93 @@ ChartJS.register(
     Tooltip,
   );
 
-  export var options = {
-    responsive: true,
-    stacked: false,
-    plugins: {
-      legend: {
-        labels: {
-          color: 'white',
-        },        
-        position: 'top',
-
-      },
-      title: {
-        color: 'white',
-        display: true,
-        text: "",
-        font: {size: 18}
-      },
-    },
-    scales: {
-      y: {
-        ticks: {
-          color: "white",
-          font: {
-            size: 14,
-          },
-        },
-        title: {
-          color: 'white',
-          display: true,
-          text: 'Name Y',
-          font: {
-            size: 14,
-          }
-        },
-        type: 'linear',
-        display: true,
-        position: 'left',
-      },
-      y1: {
-        ticks: {
-          color: "white",
-          font: {
-            size: 14,
-          },
-        },
-        title: {
-          color: 'white',
-          display: true,
-          text: 'Name Y1',
-          font: {
-            size: 14,
-          }
-        },
-        type: 'linear',
-        display: true,
-        position: 'right',
-      },
-      x: {
-        type: 'time',
-        time: {
-        	unit: 'minute',
-        },
-        ticks: {
-          color: "white",
-          font: {
-            size: 14
-          },
-        },
-        title: {
-          color: "white",
-          display: true,
-          text: 'Time',
-          font: {
-            size: 14,
-          }
-        }
-      },
-    },
-  };
   
   
   export default function CustomChart(props) {
+    var defaultOptions = {
+      responsive: true,
+      stacked: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: 'white',
+          },        
+          position: 'top',
+  
+        },
+        title: {
+          color: 'white',
+          display: true,
+          text: "",
+          font: {size: 18}
+        },
+      },
+      scales: {
+        y: {
+          ticks: {
+            color: "white",
+            font: {
+              size: 14,
+            },
+          },
+          title: {
+            color: 'white',
+            display: true,
+            text: 'Name Y',
+            font: {
+              size: 14,
+            }
+          },
+          type: 'linear',
+          display: true,
+          position: 'left',
+        },
+        y1: {
+          ticks: {
+            color: "white",
+            font: {
+              size: 14,
+            },
+          },
+          title: {
+            color: 'white',
+            display: true,
+            text: 'Name Y1',
+            font: {
+              size: 14,
+            }
+          },
+          type: 'linear',
+          display: false,
+          position: 'right',
+        },
+        x: {
+          type: 'time',
+          time: {
+            unit: 'minute',
+          },
+          ticks: {
+            color: "white",
+            font: {
+              size: 14
+            },
+          },
+          title: {
+            color: "white",
+            display: true,
+            text: 'Time',
+            font: {
+              size: 14,
+            }
+          }
+        },
+      },
+    };
+    
     const [xVal, setXVal] = React.useState([]);
     const [yVal, setYVal] = React.useState([]);
     const [Ydata, setYdata] = React.useState([]);
+    const [options, setOptions] = React.useState(defaultOptions)
 
     let data = {
       labels: xVal,
@@ -121,7 +123,6 @@ ChartJS.register(
             borderColor: props.chartdata.color[index],
             backgroundColor: props.chartdata.color[index],
           };
-          console.log(dataset);
           Ydata.push(dataset);
 
           
@@ -133,8 +134,16 @@ ChartJS.register(
         console.log(err);
       },)
     } 
-    React.useEffect(() => {
+    React.useEffect(() => {      
       getNewData();
+      console.log(props.chartdata.label);
+      let currOptions = options
+      currOptions.scales.y.title.text = props.chartdata.label[0];
+      if (props.chartdata.label.length >1){
+        currOptions.scales.y1.display=true;
+        currOptions.scales.y1.title.text = props.chartdata.label[1];
+      }
+      setOptions(currOptions);      
       const interval = setInterval(() => {
         getNewData();
       }, 10000);
