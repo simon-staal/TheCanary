@@ -18,7 +18,7 @@ RED = 22
 global timePeriod
 timePeriod = 5
 global CanaryId
-CanaryId = 1
+CanaryId = 0
 
 def initGPIO():
     GPIO.setmode(GPIO.BCM)
