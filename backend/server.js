@@ -182,8 +182,8 @@ app.get("/Humidity", (req, res) => {
 });
 
 app.get('/archive', (req, res)=> {
-    authenticateThenDo(req, res, async()=>{
-        db.collection(oldDataColl).removeMany({});
+    authenticateThenDo(req, res, ()=>{
+        db.collection(oldDataColl).deleteMany({});
         res.send('OK');
     })
 });
