@@ -21,18 +21,18 @@ const Item = styled(Paper)(({ theme }) => ({
   }));
 
 export default function Miners() {
-    const [miners, setMiners] = React.useState([]);
+    const [miners, setMiners] = React.useState({data:[], units:[]});
     let xs = 2
-    if(miners['values'].length==1){
+    if(miners.data.length==1){
         xs = 12;
     }
-    else if(miners['values'].length<=4){
+    else if(miners.data.length<=4){
       xs = 6;
     }
-    else if(miners['values'].length<=8){
+    else if(miners.data.length<=8){
       xs = 3;
     }
-    else if(miners['values'].length<=12){
+    else if(miners.data.length<=12){
       xs = 2;
     }
     else {
@@ -41,8 +41,9 @@ export default function Miners() {
     function getNewData() {
       axios.get(process.env.REACT_APP_DOMAIN + '/miners', {params: {token: sessionStorage.getItem('token')}})
           .then(res => {
-            setMiners(res.data);
             console.log(res.data);
+            setMiners(res.data);
+            
           })
           .catch(err => {
             console.log(err);
@@ -60,11 +61,7 @@ export default function Miners() {
     return(
         <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: xs, sm: 8, md: 12 }}>
-
-
-
-          
-        {miners['values'].map((miner) => (
+        {miners.data.map((miner) => (
             <Grid item xs={xs}  key={miner.id}>
                 <Miner id={miner.id} data={miner.data} units={miners.units}/>
             </Grid>

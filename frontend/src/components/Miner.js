@@ -51,7 +51,7 @@ export default function Miner(props) {
           <Typography component="div" variant="h5" color="primary">
             Team {props.id}
           </Typography>
-              <MinerTable minerData={props.data} unit={props.units}/>
+              <MinerTable minerData={props.data} units={props.units}/>
 
 
         </CardContent>
