@@ -218,7 +218,6 @@ function authenticateThenDo(req, res, fun) {
 //------- HTTP done, MQTT from here
 
 const mqtt=require('mqtt');
-const { setDatasets } = require("react-chartjs-2/dist/utils");
 
 const clientOptions = {
     clientID: "mqttjs01",
