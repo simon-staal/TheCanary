@@ -47,7 +47,7 @@ export default function Miner(props) {
       
         <CardContent sx={{ flex: '1 0 auto' }}>
           <Typography component="div" variant="h5" color="primary">
-            {props.id}
+            Team {props.id}
           </Typography>
             
             { Object.keys(props.data).map((field) => {
@@ -67,7 +67,7 @@ export default function Miner(props) {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2" color="primary">
-            {props.id}
+            Team {props.id}
           </Typography>
           <ChartGrid id = {props.id}/>
         </Box>

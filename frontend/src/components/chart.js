@@ -15,12 +15,15 @@ ChartJS.register(
 
   export var options = {
     responsive: true,
+    stacked: false,
     plugins: {
       legend: {
         labels: {
           color: 'white',
         },        
         position: 'top',
+        display: true,
+
       },
       title: {
         color: 'white',
@@ -44,7 +47,29 @@ ChartJS.register(
           font: {
             size: 14,
           }
-        }
+        },
+        type: 'linear',
+        display: true,
+        position: 'left',
+      },
+      y1: {
+        ticks: {
+          color: "white",
+          font: {
+            size: 14,
+          },
+        },
+        title: {
+          color: 'white',
+          display: true,
+          text: 'Name Y1',
+          font: {
+            size: 14,
+          }
+        },
+        type: 'linear',
+        display: true,
+        position: 'right',
       },
       x: {
         type: 'time',
@@ -73,17 +98,15 @@ ChartJS.register(
   export default function CustomChart(props) {
     const [xVal, setXVal] = React.useState([]);
     const [yVal, setYVal] = React.useState([]);
+    const [Ydata, setYdata] = React.useState([]);
 
     let data = {
       labels: xVal,
-      datasets: [
-        {
-          label: props.chartdata.label,
-          data: yVal,
-          borderColor: props.chartdata.color,
-          backgroundColor: props.chartdata.color,
-        },
-      ],
+      datasets: Ydata,
+      // grid line settings
+      grid: {
+        drawOnChartArea: false, // only want the grid lines for one axis to show up
+      },
     };
     options.plugins.title.text=props.chartdata.label;
 
@@ -93,9 +116,22 @@ ChartJS.register(
           setXVal(res.data.x);
           setYVal(res.data.data);
           data.labels=res.data.x;
+          let yVals = [];
+          let Ydata = [];
           Object.keys(res.data.data).map((key, index)=>{
-            data.datasets[index].data= res.data.data[key]
+            let dataset = {
+              label: props.chartdata.label[index],
+              data: res.data.data[key],
+              borderColor: props.chartdata.color[index],
+              backgroundColor: props.chartdata.color[index],
+            };
+            console.log(dataset);
+            Ydata.push(dataset);
+
+            
           })
+          setYdata(Ydata);
+
         })
         .catch(err => {
           console.log(err);
