@@ -14,6 +14,9 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import BasicSelect from './samplingSettings';
 import { styled , alpha} from '@mui/material/styles';
+import PropTypes from 'prop-types';
+import { Card, CardMedia } from '@mui/material';
+import { Avatar } from '@mui/material';
 
 const pages = [];
 
@@ -57,17 +60,15 @@ const StyledMenu = styled((props) => (
           theme.palette.action.selectedOpacity,
         ),
       },
-      /*
-      '& .MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper': {
-        backgroundColor: "black",
-
+      '.&MuiAvatar-root': {
+        backgroundColor: "red"
       }
-      */
     },
   },
 }));
 
-const ResponsiveAppBar = () => {
+
+const ResponsiveAppBar = ({setToken}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -86,7 +87,9 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
-
+  const logout = () => {
+    setToken(undefined);
+  }
   return (
     <AppBar style = {{background: '#434341'}} position="static">
       <Container maxWidth="xl">
@@ -97,7 +100,12 @@ const ResponsiveAppBar = () => {
             component="div"
             sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, color: 'white' }}
           >
-            LOGO
+            <CardMedia
+                component="img"
+                height="65"
+                image={require("./../img/logo2.png")}
+                alt="logo"
+                />
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -147,7 +155,6 @@ const ResponsiveAppBar = () => {
             color="white"
             sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
           >
-            LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
@@ -163,9 +170,13 @@ const ResponsiveAppBar = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
+              
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <SettingsIcon sx={{ color: 'white' }} alt="Settings" color='white' />
+                <Avatar>
+                  <SettingsIcon sx={{ color: 'white' }} alt="Settings" color='white' />
+                </Avatar>
               </IconButton>
+              
             </Tooltip>
             <StyledMenu
               sx={{ mt: '45px', color:"black" }}
@@ -186,6 +197,9 @@ const ResponsiveAppBar = () => {
                 <MenuItem key="BasicSelect">
                   <BasicSelect/>
                 </MenuItem>
+                <MenuItem key="logout" onClick = {logout}>
+                  Logout 
+                </MenuItem>
             </StyledMenu>
           </Box>
         </Toolbar>
@@ -193,4 +207,7 @@ const ResponsiveAppBar = () => {
     </AppBar>
   );
 };
+ResponsiveAppBar.propTypes = {
+  setToken: PropTypes.func.isRequired
+}
 export default ResponsiveAppBar;

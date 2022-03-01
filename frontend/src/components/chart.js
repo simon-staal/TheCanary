@@ -1,6 +1,7 @@
 import React from 'react';
-import {Chart as ChartJS,TimeScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale} from 'chart.js';
+import {Chart as ChartJS,TimeScale,  LinearScale, PointElement, LineElement, Title, Tooltip, Legend} from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import "chartjs-adapter-moment";
 import axios from 'axios';
 
 ChartJS.register(
@@ -90,9 +91,11 @@ ChartJS.register(
       axios.get(process.env.REACT_APP_DOMAIN + props.chartdata.route, { params: { id: props.id, token: sessionStorage.getItem('token')} })
         .then(res => {
           setXVal(res.data.x);
-          setYVal(res.data.y);
+          setYVal(res.data.data);
           data.labels=res.data.x;
-          data.datasets[0].data=res.data.y;
+          Object.keys(res.data.data).map((key, index)=>{
+            data.datasets[index].data= res.data.data[key]
+          })
         })
         .catch(err => {
           console.log(err);

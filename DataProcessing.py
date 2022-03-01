@@ -36,6 +36,10 @@ class Data():
     def findAvgVal(self):
         self.avgVal = np.mean(self.last20Val)
 
+    def setThresholdValues(self,min,max):
+        self.minVal = min
+        self.maxVal = max
+
     @property
     def consistentBadValues(self):
         return (self.avgVal > self.maxVal or self.avgVal < self.minVal)
@@ -43,6 +47,10 @@ class Data():
     @property
     def pollRate(self):
         return 1/self.pollingRate
+
+    @property
+    def getDangerLevel(self):
+        return self.dangerLevel
 
     @property
     def worryingValue(self):
@@ -54,16 +62,16 @@ class Data():
         self.last20Val = np.append(self.last20Val, self.lastReading)
         self.findAvgVal()
         self.checkSafety()
-        return
+        return {self.sensor: self.lastReading}, self.dangerLevel
 
     def checkSafety(self):   
         #this as a whole looks super inefficient refactor later 
         if(self.consistentBadValues):
             self.dangerLevel = RED
-            self.pollinRate = self.defaultPollingRate * 8
+            self.pollinRate = 1
         elif(self.worryingValue):
             self.dangerLevel = AMBER
-            self.pollingRate = self.defaultPollingRate * 4
+            self.pollingRate = 0.5
         else:
             self.dangerLevel = GREEN
             self.pollingRate = self.defaultPollingRate

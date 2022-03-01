@@ -6,6 +6,9 @@ import { alpha, styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
+import Card from '@mui/material/Card'
+import { CardMedia } from '@mui/material';
+
 
    const RedditTextField = styled(TextField)(({theme}) => ({
     "& .MuiInputBase-root": {
@@ -68,11 +71,18 @@ export default function Login({ setToken }) {
   }
 
   return(
+    <div style={{width: '100%', flexDirection: 'column', flexWrap: "wrap",   display: 'flex',
+    alignItems: 'center'}}>
+    <Card>
+    <CardMedia
+        component="img"
+        width= "80%"
+        image={require("./../img/logo.png")}
+        alt="logo"/>
+    </Card>
     <div style={{width: '20%', flexDirection: 'column', flexWrap: "wrap",   display: 'flex',
     alignItems: 'center'}}>
-    <Typography variant="h3" color="primary">
-        The Canary
-    </Typography>
+
     <form onSubmit={handleSubmit}>
         <RedditTextField id="username" label="Username" onChange={e => setUserName(e.target.value)} />
         
@@ -86,6 +96,7 @@ export default function Login({ setToken }) {
         <ColorButton type="submit">Submit</ColorButton>
       </div>
     </form>
+    </div>
     </div>
 
   )

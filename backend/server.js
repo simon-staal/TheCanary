@@ -114,7 +114,7 @@ app.get("/CO2", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, "CO2")
+                const data = await getHistoricalData(minerId, ["CO2", "TVOC"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -133,7 +133,7 @@ app.get("/Pressure", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, "Pressure")
+                const data = await getHistoricalData(minerId, ["Pressure"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -151,7 +151,7 @@ app.get("/Temperature", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, "Temperature")
+                const data = await getHistoricalData(minerId, ["Temperature"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -168,7 +168,7 @@ app.get("/Humidity", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, "Humidity")
+                const data = await getHistoricalData(minerId, ["Humidity"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -283,16 +283,21 @@ async function getMiners() {
     return result;
 }
 
-async function getHistoricalData(id, key) {
+async function getHistoricalData(id, keyArray) {
     var query = {id: id};
-    let y = [];
     let x = [];
+    let data = {}
+    keyArray.map((key) => {
+        data[key] = [];
+    })
     let result = await db.collection(oldDataColl).find(query, { projection: { _id: 0, data: 1, time:1 }}).toArray()
     result.map((elem) => {
-        y.push(elem.data[key]);
+        keyArray.map((key) => {
+            data[key].push(elem.data[key]);
+        })
         x.push(elem.time.getTime());
     })
-    return {x: x, y: y}
+    return {x: x, data: data}
 }
 
 function addNewData(id, data) {
