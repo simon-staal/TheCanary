@@ -9,7 +9,7 @@ import { alpha, styled } from '@mui/material/styles';
 import {theme} from './../App';
 import InputBase from '@mui/material/InputBase';
 
-let freqs = [10,20,30,40];
+let freqs = [1,2,5,10,30,60];
 
 const StyledSelect = styled(({ className, ...props }) => (
   <Select {...props} MenuProps={{ classes: { paper: className } }} />
@@ -50,19 +50,16 @@ export default function BasicSelect() {
         });
   };
 
-  const inputProps = {
-    color: "red",
-  }
 
   return (
     <Box sx={{ minWidth: 180 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label" sx={{color: theme.palette.primary.main, backgroundColor: theme.palette.backgroundLight.main}}>Sampling frequency</InputLabel>
+        <InputLabel id="demo-simple-select-label" sx={{color: theme.palette.primary.main, backgroundColor: theme.palette.backgroundLight.main}}>Sampling interval</InputLabel>
         <StyledSelect
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={freq}
-          label="Sampling frequency"
+          label="Sampling interval"
           onChange={handleChange}
           sx={{borderColor: "red"}}
           input={<StyledInput />}
@@ -70,7 +67,7 @@ export default function BasicSelect() {
 
         >
           {freqs.map((f) => (
-              <MenuItem value={f} key={f}>{f}</MenuItem>
+              <MenuItem value={f} key={f}>{f+ ' s'}</MenuItem>
           ))}
         </StyledSelect>
       </FormControl>
