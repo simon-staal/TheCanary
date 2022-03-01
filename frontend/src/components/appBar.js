@@ -94,6 +94,7 @@ const ResponsiveAppBar = ({setToken}) => {
     .catch(err => {
       console.log(err);
     },)
+    handleCloseUserMenu();
   };
 
   const logout = () => {

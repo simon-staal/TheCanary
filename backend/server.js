@@ -182,7 +182,7 @@ app.get("/Humidity", (req, res) => {
 });
 
 app.get('/archive', (req, res)=> {
-    authenticateThenDo((req, res)=>{
+    authenticateThenDo(req, res, async()=>{
         db.collection(oldDataColl).removeMany({});
         res.send('OK');
     })
