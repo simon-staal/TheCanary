@@ -9,8 +9,21 @@ import DataProcessing as Data
 from DataProcessing import Data
 import numpy as np
 import json
+import RPi.GPIO as GPIO
 
-CanaryId = "noId"
+GREEN = 17
+AMBER = 27
+RED = 22
+
+CanaryId = "1"
+
+def initGPIO():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup(GREEN,GPIO.OUT)
+    GPIO.setup(AMBER,GPIO.OUT)
+    GPIO.setup(RED,GPIO.OUT)
+    GPIO.output(GREEN,GPIO.HIGH)
 
 #set up sensors - i2c connections + mqtt
 def initSensors():
@@ -20,14 +33,15 @@ def initSensors():
     tempHumiditySensor = Si7021.SENSOR(bus)
     airPressureSensor = bmp280.Sensor(bus)
 
-    time.sleep(2)
+    time.sleep(1)
 
     co2Data = Data("CO2", airQualitySensor.getco2)
     tempData = Data("Temperature", tempHumiditySensor.getTemp)
     humidityData = Data("Humidity", tempHumiditySensor.getHumid)
     airPressureData = Data("Pressure", airPressureSensor.pressure)
-    time.sleep(1)
     tvocData = Data("TVOC", airQualitySensor.getTvoc)
+
+    tempData.setThresholdValues(0,23.5)
 
     return co2Data, tempData, humidityData, airPressureData, tvocData
 
@@ -39,7 +53,6 @@ def onConnect(client, userdata, flags, rc):
     print("Connected")
     client.subscribe("test/#")
     client.subscribe("sensor/instructions/#")
-    
 
 def initMQTT(): 
     client = mqtt.Client()
@@ -63,22 +76,40 @@ def sendInfo(data, client):
     print("...")
     print(f"publish status: {mqtt.error_string(MsgInfo.rc)}")
 
+def setLEDs(dangerLevels):
+    setLED = GREEN
+    GPIO.output(GREEN,GPIO.LOW)
+    GPIO.output(AMBER,GPIO.LOW)
+    GPIO.output(RED,GPIO.LOW)
+    for i in dangerLevels:
+        if i == 2:
+            setLED = RED
+            break
+        elif i == 1:
+            setLED = AMBER
+    
+    GPIO.output(setLED,GPIO.HIGH)
+
+
 def main():
     print("start of main")
+    initGPIO()
     co2, temp, humidity, airPresssure, tvoc = initSensors()
     print("mqtt")
     client = initMQTT()
     
     while(1): # placeholder gonna figure out different sensor pollrates
         data = {}
+        dangerLevels = []
         client.loop()
         for i in {co2, temp, humidity, airPresssure, tvoc}:
-            reading = i.oneReading()
-            print("measured data", reading)
+            reading, danger = i.processData()
+            dangerLevels.append(danger)
             data.update(reading)
         print("data: ", data)
         sendInfo(data, client)
-        time.sleep(co2.pollRate)
+        setLEDs(dangerLevels)
+        time.sleep(temp.pollRate)
 
     
     
