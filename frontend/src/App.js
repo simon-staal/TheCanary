@@ -29,6 +29,10 @@ export const theme = createTheme({
     backgroundLight: {
       main: '#313131',
     },
+    tablebackground: {
+      even: '#2F2F2F',
+      odd: '#3F3F3F',
+    }
   },
   overrides: {
     MuiMenuItem: {

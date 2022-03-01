@@ -7,6 +7,9 @@ import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Modal from '@mui/material/Modal';
 import ChartGrid  from './chartGrid';
+import { Button } from '@mui/material';
+import { alpha, styled } from '@mui/material/styles';
+import MinerTable from './table';
 
 
 
@@ -26,7 +29,6 @@ const style = {
   textAlign: "center",
   backgroundColor: '#313131',
 };
-
 
 
 export default function Miner(props) {
@@ -49,13 +51,8 @@ export default function Miner(props) {
           <Typography component="div" variant="h5" color="primary">
             Team {props.id}
           </Typography>
-            
-            { Object.keys(props.data).map((field) => {
-                return (
-                  <Typography color="secondary" component="div" aligh="center" key={field}>
-                        {field}: {props.data[field]}
-                  </Typography>)
-            })}
+              <MinerTable minerData={props.data} unit={props.units}/>
+
 
         </CardContent>
         </ButtonBase>
@@ -66,9 +63,9 @@ export default function Miner(props) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" color="primary">
-            Team {props.id}
-          </Typography>
+            <Typography id="modal-modal-title" variant="h5" component="h2" color="primary">
+              Team {props.id}
+            </Typography>
           <ChartGrid id = {props.id}/>
         </Box>
       </Modal>

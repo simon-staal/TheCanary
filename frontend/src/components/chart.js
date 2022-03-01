@@ -22,7 +22,6 @@ ChartJS.register(
           color: 'white',
         },        
         position: 'top',
-        display: true,
 
       },
       title: {
@@ -109,33 +108,38 @@ ChartJS.register(
       },
     };
     options.plugins.title.text=props.chartdata.label;
-
-    React.useEffect(() => {
+    function getNewData () {
       axios.get(process.env.REACT_APP_DOMAIN + props.chartdata.route, { params: { id: props.id, token: sessionStorage.getItem('token')} })
-        .then(res => {
-          setXVal(res.data.x);
-          setYVal(res.data.data);
-          data.labels=res.data.x;
-          let yVals = [];
-          let Ydata = [];
-          Object.keys(res.data.data).map((key, index)=>{
-            let dataset = {
-              label: props.chartdata.label[index],
-              data: res.data.data[key],
-              borderColor: props.chartdata.color[index],
-              backgroundColor: props.chartdata.color[index],
-            };
-            console.log(dataset);
-            Ydata.push(dataset);
+      .then(res => {
+        setXVal(res.data.x);
+        data.labels=res.data.x;
+        let Ydata = [];
+        Object.keys(res.data.data).map((key, index)=>{
+          let dataset = {
+            label: props.chartdata.label[index],
+            data: res.data.data[key],
+            borderColor: props.chartdata.color[index],
+            backgroundColor: props.chartdata.color[index],
+          };
+          console.log(dataset);
+          Ydata.push(dataset);
 
-            
-          })
-          setYdata(Ydata);
-
+          
         })
-        .catch(err => {
-          console.log(err);
-        },)
+        setYdata(Ydata);
+
+      })
+      .catch(err => {
+        console.log(err);
+      },)
+    } 
+    React.useEffect(() => {
+      getNewData();
+      const interval = setInterval(() => {
+        getNewData();
+      }, 10000);
+    
+      return () => clearInterval(interval);
     }, []); 
 
 

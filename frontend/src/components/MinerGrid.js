@@ -38,22 +38,31 @@ export default function Miners() {
     else {
       xs = 1;
     }
-    React.useEffect(() => {
-        console.log(process.env.REACT_APP_DOMAIN);
-        axios.get(process.env.REACT_APP_DOMAIN + '/miners', {params: {token: sessionStorage.getItem('token')}})
+    function getNewData() {
+      axios.get(process.env.REACT_APP_DOMAIN + '/miners', {params: {token: sessionStorage.getItem('token')}})
           .then(res => {
             setMiners(res.data);
+            console.log(res.data);
           })
           .catch(err => {
             console.log(err);
           },)
+    }
+    React.useEffect(() => {
+        console.log(process.env.REACT_APP_DOMAIN);
+        getNewData();
+        const interval = setInterval(() => {
+          getNewData();
+        }, 5000);
+      
+        return () => clearInterval(interval);
       }, []); //error handling
     return(
         <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: xs, sm: 8, md: 12 }}>
         {miners.map((miner) => (
             <Grid item xs={xs}  key={miner.id}>
-                <Miner id={miner.id} data={miner.data}/>
+                <Miner id={miner.values.id} data={miner.values.data} units={miner.units}/>
             </Grid>
         ))}
         </Grid>

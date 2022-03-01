@@ -17,6 +17,7 @@ import { styled , alpha} from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { Card, CardMedia } from '@mui/material';
 import { Avatar } from '@mui/material';
+import axios from 'axios';
 
 const pages = [];
 
@@ -85,6 +86,14 @@ const ResponsiveAppBar = ({setToken}) => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const archive = () => {
+    axios.get(process.env.REACT_APP_DOMAIN + '/archive', { params: { token: sessionStorage.getItem('token')} })
+    .then(res => {})
+    .catch(err => {
+      console.log(err);
+    },)
   };
 
   const logout = () => {
@@ -196,6 +205,9 @@ const ResponsiveAppBar = ({setToken}) => {
             >
                 <MenuItem key="BasicSelect">
                   <BasicSelect/>
+                </MenuItem>
+                <MenuItem key="archive" onClick = {archive}>
+                  Archive data
                 </MenuItem>
                 <MenuItem key="logout" onClick = {logout}>
                   Logout 
