@@ -19,6 +19,8 @@ global timePeriod
 timePeriod = 5
 global CanaryId
 CanaryId = 0
+global dangerLevel
+dangerLevel = 0
 
 def initGPIO():
     GPIO.setmode(GPIO.BCM)
@@ -74,9 +76,11 @@ def initMQTT():
     return client
 
 def sendInfo(data, client):
+    global dangerLevel
     msg = {"id":CanaryId+1}
     info = {"data": data}
     msg.update(info)
+    msg.update({"danger":dangerLevel})
     print("sending to server: ", msg)
     MsgInfo = client.publish("sensor/data", json.dumps(msg))
     print("...")
@@ -84,15 +88,19 @@ def sendInfo(data, client):
 
 def setLEDs(dangerLevels):
     setLED = GREEN
+    global dangerLevel
+    dangerLevel = 0
     GPIO.output(GREEN,GPIO.LOW)
     GPIO.output(AMBER,GPIO.LOW)
     GPIO.output(RED,GPIO.LOW)
     for i in dangerLevels:
         if i == 2:
             setLED = RED
+            dangerLevel = 2
             break
         elif i == 1:
             setLED = AMBER
+            dangerLevel = 1
     
     GPIO.output(setLED,GPIO.HIGH)
 
