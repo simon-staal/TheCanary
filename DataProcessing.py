@@ -71,7 +71,8 @@ class Data():
             self.pollinRate = 1
         elif(self.worryingValue):
             self.dangerLevel = AMBER
-            self.pollingRate = 0.5
+            if 0.5 > self.pollingRate:
+                self.pollingRate = 0.5
         else:
             self.dangerLevel = GREEN
             self.pollingRate = self.defaultPollingRate

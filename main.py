@@ -76,7 +76,7 @@ def sendInfo(data, client):
 
 def setLEDs(dangerLevels):
     setLED = GREEN
-    GPIO.output(GREEN,GPIO.HIGH)
+    GPIO.output(GREEN,GPIO.LOW)
     GPIO.output(AMBER,GPIO.LOW)
     GPIO.output(RED,GPIO.LOW)
     for i in dangerLevels:
@@ -107,7 +107,7 @@ def main():
         print("data: ", data)
         sendInfo(data, client)
         setLEDs(dangerLevels)
-        time.sleep(co2.pollRate)
+        time.sleep(temp.pollRate)
 
     
     
