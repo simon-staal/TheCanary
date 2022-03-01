@@ -81,7 +81,7 @@ app.get("/miners", (req, res) => {
         try {
             const miners = await getMiners()
             console.log(miners)
-            res.send({values: miners, units: {Humidity: '%', Temperature: '°C', Pressure: 'hPa', CO2: 'ppm', TVOC: 'ppb'}});
+            res.send({data: miners, units: {Humidity: '%', Temperature: '°C', Pressure: 'hPa', CO2: 'ppm', TVOC: 'ppb'}});
         } catch (err) {
             console.log(err)
             res.status(418).send(err)

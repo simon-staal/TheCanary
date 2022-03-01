@@ -23,16 +23,16 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Miners() {
     const [miners, setMiners] = React.useState([]);
     let xs = 2
-    if(miners.length==1){
+    if(miners['values'].length==1){
         xs = 12;
     }
-    else if(miners.length<=4){
+    else if(miners['values'].length<=4){
       xs = 6;
     }
-    else if(miners.length<=8){
+    else if(miners['values'].length<=8){
       xs = 3;
     }
-    else if(miners.length<=12){
+    else if(miners['values'].length<=12){
       xs = 2;
     }
     else {
@@ -60,9 +60,13 @@ export default function Miners() {
     return(
         <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: xs, sm: 8, md: 12 }}>
-        {miners.map((miner) => (
+
+
+
+          
+        {miners['values'].map((miner) => (
             <Grid item xs={xs}  key={miner.id}>
-                <Miner id={miner.values.id} data={miner.values.data} units={miner.units}/>
+                <Miner id={miner.id} data={miner.data} units={miners.units}/>
             </Grid>
         ))}
         </Grid>
