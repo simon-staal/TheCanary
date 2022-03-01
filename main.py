@@ -41,6 +41,8 @@ def initSensors():
     airPressureData = Data("Pressure", airPressureSensor.pressure)
     tvocData = Data("TVOC", airQualitySensor.getTvoc)
 
+    tempData.setThresholdValues(0,23.5)
+
     return co2Data, tempData, humidityData, airPressureData, tvocData
 
 def onMessage(client, userdata, message):
