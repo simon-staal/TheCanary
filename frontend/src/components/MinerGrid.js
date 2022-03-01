@@ -21,39 +21,49 @@ const Item = styled(Paper)(({ theme }) => ({
   }));
 
 export default function Miners() {
-    const [miners, setMiners] = React.useState([]);
+    const [miners, setMiners] = React.useState({data:[], units:[]});
     let xs = 2
-    if(miners.length==1){
+    if(miners.data.length==1){
         xs = 12;
     }
-    else if(miners.length<=4){
+    else if(miners.data.length<=4){
       xs = 6;
     }
-    else if(miners.length<=8){
+    else if(miners.data.length<=8){
       xs = 3;
     }
-    else if(miners.length<=12){
+    else if(miners.data.length<=12){
       xs = 2;
     }
     else {
       xs = 1;
     }
-    React.useEffect(() => {
-        console.log(process.env.REACT_APP_DOMAIN);
-        axios.get(process.env.REACT_APP_DOMAIN + '/miners', {params: {token: sessionStorage.getItem('token')}})
+    function getNewData() {
+      axios.get(process.env.REACT_APP_DOMAIN + '/miners', {params: {token: sessionStorage.getItem('token')}})
           .then(res => {
+            console.log(res.data);
             setMiners(res.data);
+            
           })
           .catch(err => {
             console.log(err);
           },)
+    }
+    React.useEffect(() => {
+        console.log(process.env.REACT_APP_DOMAIN);
+        getNewData();
+        const interval = setInterval(() => {
+          getNewData();
+        }, 5000);
+      
+        return () => clearInterval(interval);
       }, []); //error handling
     return(
         <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: xs, sm: 8, md: 12 }}>
-        {miners.map((miner) => (
+        {miners.data.map((miner) => (
             <Grid item xs={xs}  key={miner.id}>
-                <Miner id={miner.id} data={miner.data}/>
+                <Miner id={miner.id} data={miner.data} units={miners.units}/>
             </Grid>
         ))}
         </Grid>

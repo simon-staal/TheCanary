@@ -81,7 +81,7 @@ app.get("/miners", (req, res) => {
         try {
             const miners = await getMiners()
             console.log(miners)
-            res.send(miners)
+            res.send({data: miners, units: {Humidity: '%', Temperature: '°C', Pressure: 'hPa', CO2: 'ppm', TVOC: 'ppb'}});
         } catch (err) {
             console.log(err)
             res.status(418).send(err)
@@ -178,6 +178,13 @@ app.get("/Humidity", (req, res) => {
         else {
             res.status(500).send({ error: 'No id(ea) provided' })
         }
+    })
+});
+
+app.get('/archive', (req, res)=> {
+    authenticateThenDo(req, res, ()=>{
+        db.collection(oldDataColl).deleteMany({});
+        res.send('OK');
     })
 });
 
