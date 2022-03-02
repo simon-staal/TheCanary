@@ -97,7 +97,6 @@ ChartJS.register(
     };
     
     const [xVal, setXVal] = React.useState([]);
-    const [yVal, setYVal] = React.useState([]);
     const [Ydata, setYdata] = React.useState([]);
     const [options, setOptions] = React.useState(defaultOptions)
 
@@ -116,12 +115,14 @@ ChartJS.register(
         setXVal(res.data.x);
         data.labels=res.data.x;
         let Ydata = [];
+        let yIds = ['y', 'y1'];
         Object.keys(res.data.data).map((key, index)=>{
           let dataset = {
             label: props.chartdata.label[index],
             data: res.data.data[key],
             borderColor: props.chartdata.color[index],
             backgroundColor: props.chartdata.color[index],
+            yAxisID: yIds[index],
           };
           Ydata.push(dataset);
 
