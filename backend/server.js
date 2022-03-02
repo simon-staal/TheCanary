@@ -231,6 +231,7 @@ function authenticateThenDo(req, res, fun) {
         }
         else {
                 console.log(req.query)
+		console.log(req.params)
 		console.log(req.body)
 		console.log('Failed verification')
 	        res.status(401).send(err);
