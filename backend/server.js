@@ -331,6 +331,7 @@ let averageWindow = {}
 function addNewData(id, data) {
     var query = {id: id};
     var insertion = {id:id, data:data,time: new Date()}
+    console.log(averageWindow);
     //delete data for this id form database
     if(averageWindow.id !== undefined) {
         if(insertion.time.getTime() - averageWindow.id.time.getTime() > 60000) {
