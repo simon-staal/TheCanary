@@ -8,6 +8,7 @@ The Canary is an IoT sensor network intended to be used by miners or any other i
 - Temperature
 - Humidity
 - Air pressure
+
 The temperature and humidity readings are used to improve the accuracy of the CO2 and TVOC readings. Data is sent to our server via MQTT over TLS, with all certificates used by our system signed by The Canary CA. Data on the server is processed and securely stored in an external database. Users can interact with this system via our web-app, which can be accessed [**here**](https://thecanary.duckdns.org), which I (sts219) will host until my EC2 free trial expires. This allows the sensor sampling rate to be specified, data to be archived, and displays metrics in a digestible format. The promotional website for the product can be found [**here**](https://kc31949.wixsite.com/the-canary).
 
 Find a guide to the repository below:
