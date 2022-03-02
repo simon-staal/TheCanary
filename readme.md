@@ -1,46 +1,36 @@
-Embedded Systems Coursework 1
+The Canary - Embedded Systems CW1
 =============================
-Use this file to keep track of shit.
+This repository contains all the files developed as part of ELEC60013 - Embedded Systems.
 
-Pi Setup
---------
-- Follow [**setup lab instructions**](lab-instructions-cw1-part1.pdf), you can skip the part about researching the sensor, make sure I2C / python is installed
-- Install git:
-  ```
-  $ sudo apt update
-  $ sudo apt install git
-  ```
-- Add an ssh key for your raspberry pi as follows:
-  ```
-  $ ssh-keygen -t ed25519 -C "<your_github_email>"
-  // Press enter through all the prompts
-  $ cat ~/.ssh/id_ed25519.pub 
-  ```
-  Copy the output to your clipboard and paste it into the relevant field to add a new key here.
+The Canary is an IoT sensor network intended to be used by miners or any other industries which require human labour in confined spaces. Sensors are all controlled by a raspberry pi which performs initial data processing, and measure:
+- CO2 
+- TVOC
+- Temperature
+- Humidity
+- Air pressure
+The temperature and humidity readings are used to improve the accuracy of the CO2 and TVOC readings. Data is sent to our server via MQTT over TLS, with all certificates used by our system signed by The Canary CA. Data on the server is processed and securely stored in an external database. Users can interact with this system via our web-app, which can be accessed [**here**](https://thecanary.duckdns.org), which I (sts219) will host until my EC2 free trial expires. This allows the sensor sampling rate to be specified, data to be archived, and displays metrics in a digestible format. The promotional website for the product can be found [**here**](https://kc31949.wixsite.com/the-canary).
 
-  You should now be able to clone the repo onto your raspberry pi
+Find a guide to the repository below:
 
-CCS811 Air Quality Sensor
--------------------------
-Datasheet: https://cdn.sparkfun.com/assets/2/c/c/6/5/CN04-2019_attachment_CCS811_Datasheet_v1-06.pdf
+[AWS](AWS)
+-------
+This folder contains the configuration files for the MQTT broker and nginx web server, instructions for the provisioning of the instance, and all the certificate/key pairs for the nodes in our system (yes I know that's not secure this is a uni project).
 
-Wiring: https://blog.adafruit.com/2017/08/14/updated-guide-adafruit-ccs811-air-quality-sensor-with-raspberry-pi-wiring-instructions-and-python-code-adafruitlearningsystem/
+[backend](backend)
+----------
+This folder contains the files for our backend server, which processes data and handles communication between the sensors, the database and the frontend clients.
 
-Guide: https://www.avimesa.com/docs/dev-kits/kit-5-air-quality-using-a-raspberry-pi/
+[frontend](frontend)
+-----------
+This folder contains the files for our web-app which the user interacts with.
 
-TVOC (less than 500 ppb): 
-    https://www.renesas.com/us/en/document/whp/overview-tvoc-and-indoor-air-quality
-    https://www.worldgbc.org/sites/default/files/bp-resource/BPFP-IEQ-Guidance-Note.pdf
+[pi](pi)
+-----
+This folder contains the sensor interfaces and main code which runs on our pi device.
 
-CO2 (less than 5000 ppm if exposed for several hours):
-    https://www.health.state.mn.us/communities/environment/air/toxins/co2.html#:~:text=This%20could%20occur%20when%20exposed,dangerous%20to%20life%20and%20health.
-
-Adafruit MPRLS Air Pressure Sensor
--------------------------
-Company Website: https://www.adafruit.com/product/3965
-API: https://docs.circuitpython.org/projects/mprls/en/latest/ , https://github.com/adafruit/Adafruit_CircuitPython_MPRLS
-DataSheet: https://prod-edam.honeywell.com/content/dam/honeywell-edam/sps/siot/en-us/products/sensors/pressure-sensors/board-mount-pressure-sensors/micropressure-mpr-series/documents/sps-siot-mpr-series-datasheet-32332628-ciid-172626.pdf?download=false
-
-Si7021-A20 HUMIDITY AND TEMPERATURE SENSOR
--------------------------
-DataSheet: https://cdn-learn.adafruit.com/assets/assets/000/035/931/original/Support_Documents_TechnicalDocs_Si7021-A20.pdf
+Contributors
+------------
+- Simon Staal (sts219) - System Architecture, Sensor Interfaces, Web-app
+- Petra Ratkai (petraratkai) - Web-app
+- Aaron Ko (TszwangKo) - Sensor Interfaces, Promotional Material
+- Kai Connway-Lai (kc319) - Pi, Promotional Material
