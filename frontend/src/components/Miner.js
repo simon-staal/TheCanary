@@ -54,7 +54,7 @@ export default function Miner(props) {
 
   function removeMiner(e){
     e.stopPropagation();
-    axios.get(process.env.REACT_APP_DOMAIN + '/deleteMiner', {params: {token: sessionStorage.getItem('token'), id: props.id}})
+    axios.delete(process.env.REACT_APP_DOMAIN + '/deleteMiner?token=' + sessionStorage.getItem('token') , {data: {id: props.id}})
           .then(res => {            
           })
           .catch(err => {
