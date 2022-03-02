@@ -54,12 +54,12 @@ export default function Miners() {
         getNewData();
         const interval = setInterval(() => {
           getNewData();
-        }, 5000);
+        }, 200);
       
         return () => clearInterval(interval);
       }, []); //error handling
     return(
-        <Box sx={{paddingTop: "1%", flexGrow: 1 }}>
+        <Box sx={{paddingTop: "1%", paddingBottom: "1%", paddingLeft:"1%", paddingRight:"1%", flexGrow: 1 }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: xs, sm: 8, md: 12 }}>
         {miners.data.map((miner) => (
             <Grid item xs={xs}  key={miner.id}>
