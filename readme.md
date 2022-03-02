@@ -29,7 +29,7 @@ This folder contains the files for our web-app which the user interacts with.
 -----
 This folder contains the sensor interfaces and main code which runs on our pi device.
 
-[website](website)
+website
 ---------
 https://kc31949.wixsite.com/the-canary
 
