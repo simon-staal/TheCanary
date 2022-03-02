@@ -31,6 +31,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://TheCanary:bn8Ek7ILbvLxlBMy@cluster0.zplcu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const oldDataColl = "HistoricalData";
 const currDataColl = "CurrentData";
+const archiveColl = "Archive"
 
 const DBClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 var db;
@@ -65,7 +66,6 @@ const privateKey = fs.readFileSync('../AWS/cert/webapp.key')
 // If successful this returns a session token to be included as part of the query parameters for all subsequent endpoint calls
 app.post('/login', (req, res) => {
     // Purely for demonstrative purposes, if we had actual users we would store users + password hashes in a database, and compare to those
-    console.log(req.body)
     if (req.body.username === 'admin' && req.body.password === "password") {
         let token = jwt.sign({ token: 'poggers'}, privateKey);
         res.send({token: token});
@@ -80,7 +80,6 @@ app.get("/miners", (req, res) => {
     authenticateThenDo(req, res, async () => {
         try {
             const miners = await getMiners()
-            console.log(miners)
             res.send({data: miners, units: {Humidity: '%', Temperature: '°C', Pressure: 'hPa', CO2: 'ppm', TVOC: 'ppb'}});
         } catch (err) {
             console.log(err)
@@ -114,7 +113,7 @@ app.get("/CO2", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, ["CO2", "TVOC"])
+                const data = await getHistoricalData(parseInt(minerId), ["CO2", "TVOC"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -133,7 +132,7 @@ app.get("/Pressure", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, ["Pressure"])
+                const data = await getHistoricalData(parseInt(minerId), ["Pressure"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -151,7 +150,7 @@ app.get("/Temperature", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, ["Temperature"])
+                const data = await getHistoricalData(parseInt(minerId), ["Temperature"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -168,7 +167,7 @@ app.get("/Humidity", (req, res) => {
         const minerId = req.query?.id;
         if(minerId) {
             try {
-                const data = await getHistoricalData(minerId, ["Humidity"])
+                const data = await getHistoricalData(parseInt(minerId), ["Humidity"])
                 res.send(data)
             } catch (err) {
                 console.log(err)
@@ -183,7 +182,7 @@ app.get("/Humidity", (req, res) => {
 
 app.get('/archive', (req, res)=> {
     authenticateThenDo(req, res, ()=>{
-        db.collection(oldDataColl).deleteMany({});
+        db.collection(oldDataColl).deleteMany({}); // Empties the graph data (data is already stored in archive)
         res.send('OK');
     })
 });
@@ -220,7 +219,6 @@ app.use((req, res, next) => {
 /// If the request contains a valid token, process the request defined in function, else return an error
 function authenticateThenDo(req, res, fun) {
     let token = req.query.token;
-    console.log(token)
     jwt.verify(token, privateKey, (err, decoded) => {
         if(!err) {
             if(decoded.token === 'poggers') {
@@ -279,7 +277,6 @@ MQTTclient.on("error", error => {
 MQTTclient.on('message', (topic, message, packet) => {
 	if (topic === "sensor/data") {
         let msg = JSON.parse(message.toString())
-        console.log(msg);
         addNewData(msg.id, msg.data);
 	}
 })
@@ -302,6 +299,7 @@ function publish(topic,msg,options=pubOptions){
 //gets the current miner data from the database and returns them in an array
 async function getMiners() {
     let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray()
+    result.sort((a, b) => a.id - b.id)
     return result;
 }
 
@@ -322,9 +320,49 @@ async function getHistoricalData(id, keyArray) {
     return {x: x, data: data}
 }
 
+let averageWindow = {}
+
 function addNewData(id, data) {
     var query = {id: id};
+    var insertion = {id:id, data:data,time: new Date()}
     //delete data for this id form database
+    if(averageWindow.id !== undefined) {
+        if(insertion.time.getTime() - averageWindow.id.time.getTime() > 60000) {
+            // Inserts into graph data
+            for (const [key, value] of Object.entries(averageWindow.id.data)) {
+                averageWindow.id.data[key] = value / averageWindow.id.count;
+            }
+            averageInsertion = {
+                id:id,
+                data:averageWindow.id.data,
+                time: new Date((insertion.time.getTime() + averageWindow.id.time.getTime())/2)
+            }
+            // Reset average window
+            averageWindow.id.data = data;
+            averageWindow.id.time = insertion.time;
+            averageWindow.id.count = 1;
+            db.collection(oldDataColl).insertOne(averageInsertion, function(err, res) {
+                if (err){
+                    console.log(err);
+                    throw err;
+                }
+            });
+        }
+        else {
+            averageWindow.id.count += 1;
+            for (const [key, value] of Object.entries(averageWindow.id.data)) {
+                averageWindow.id.data[key] += data[key];
+            }
+        }
+    }
+    else { // First time we see id
+        averageWindow.id = {
+            data: data,
+            time: insertion.time,
+            count: 1
+        }
+    }
+
     db.collection(currDataColl).deleteMany(query,(err, obj) => {
         if (err){
             console.log(err);
@@ -332,7 +370,7 @@ function addNewData(id, data) {
         }
         else {
             //console.log(obj.result.n + " document(s) deleted");
-            db.collection(currDataColl).insertOne({id:id, data:data,time: new Date()}, function(err, res) {
+            db.collection(currDataColl).insertOne(insertion, function(err, res) {
                 if (err){
                     console.log(err);
                     throw err;
@@ -340,7 +378,8 @@ function addNewData(id, data) {
             }); 
         }
     });
-    db.collection(oldDataColl).insertOne({id:id, data:data,time: new Date()}, function(err, res) {
+
+    db.collection(archiveColl).insertOne(insertion, function(err, res) {
         if (err){
             console.log(err);
             throw err;
