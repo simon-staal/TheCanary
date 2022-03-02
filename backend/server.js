@@ -196,11 +196,11 @@ app.post('/freq', (req, res)=>{
     })
 });
 
-app.get('/deleteMiner', (req, res)=> {
+app.delete('/deleteMiner', (req, res)=> {
     authenticateThenDo(req, res, ()=>{
-        const minerId = req.query?.id;
+        const minerId = req.body?.id;
         if(minerId) {
-            var query = {id: minerId};
+            var query = {id: parseInt(minerId)};
             db.collection(oldDataColl).deleteMany(query);
             db.collection(currDataColl).deleteMany(query);
             res.send('OK');
@@ -300,8 +300,11 @@ function publish(topic,msg,options=pubOptions){
 async function getMiners() {
     let result = await db.collection(currDataColl).find({}, { projection: { _id: 0, id: 1, data: 1 } }).toArray()
     result.sort((a, b) => {
-        if (a.danger === b.danger) a.id - b.id
-        a.danger - b.danger
+        if (a.danger === b.danger) {
+            return a.id - b.id;
+        }
+        console.log(`Danger A: ${a.danger}, Danger B: ${b.danger}`);
+        return a.danger - b.danger;
     });
     result.forEach((item, index) => {
         delete item.danger
