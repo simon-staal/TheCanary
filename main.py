@@ -38,7 +38,7 @@ def initSensors():
     tempHumiditySensor = Si7021.SENSOR(bus)
     airPressureSensor = bmp280.Sensor(bus)
     time.sleep(1)
-    airQualitySensor.setEnv({"humidity":tempHumiditySensor.getHumid ,"temp": tempHumiditySensor.getTemp})
+    airQualitySensor.setEnv({"humidity":tempHumiditySensor.getHumid() ,"temp": tempHumiditySensor.getTemp()})
 
     time.sleep(1)
 
