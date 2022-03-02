@@ -29,6 +29,10 @@ This folder contains the files for our web-app which the user interacts with.
 -----
 This folder contains the sensor interfaces and main code which runs on our pi device.
 
+[website]
+---------
+https://kc31949.wixsite.com/the-canary
+
 Contributors
 ------------
 - Simon Staal (sts219) - System Architecture, Sensor Interfaces, Web-app
