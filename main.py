@@ -37,6 +37,8 @@ def initSensors():
     airQualitySensor = ccs811.SENSOR(bus)
     tempHumiditySensor = Si7021.SENSOR(bus)
     airPressureSensor = bmp280.Sensor(bus)
+    time.sleep(1)
+    airQualitySensor.setEnv({"humidity":tempHumiditySensor.getHumid ,"temp": tempHumiditySensor.getTemp})
 
     time.sleep(1)
 
@@ -47,6 +49,12 @@ def initSensors():
     tvocData = Data("TVOC", airQualitySensor.getTvoc)
 
     tempData.setThresholdValues(0,23.5)
+    co2Data.setThresholdValues(0,1500)
+    humidityData.setThresholdValues(0,80)
+    airPressureData.setThresholdValues(400,1600)
+    tvocData.setThresholdValues(0,5000)
+
+
 
     return co2Data, tempData, humidityData, airPressureData, tvocData
 
@@ -78,8 +86,7 @@ def initMQTT():
 def sendInfo(data, client):
     global dangerLevel
     msg = {"id":CanaryId+1}
-    info = {"data": data}
-    msg.update(info)
+    msg.update({"data": data})
     msg.update({"danger":dangerLevel})
     print("sending to server: ", msg)
     MsgInfo = client.publish("sensor/data", json.dumps(msg))
@@ -101,15 +108,15 @@ def setLEDs(dangerLevels):
         elif i == 1:
             setLED = AMBER
             dangerLevel = 1
-    
+
     GPIO.output(setLED,GPIO.HIGH)
 
-
 def main():
-    print("start of main")
+    print("Program start")
     initGPIO()
+    print("Setting up sensors")
     co2, temp, humidity, airPresssure, tvoc = initSensors()
-    print("mqtt")
+    print("Setting up MQTT")
     client = initMQTT()
     
     while(1): # placeholder gonna figure out different sensor pollrates
@@ -121,9 +128,6 @@ def main():
             reading, danger = i.processData()
             dangerLevels.append(danger)
             data.update(reading)
-        print("data: ", data)
-        if(data.get("TVOC") > 2000):
-            exit()
         sendInfo(data, client)
         setLEDs(dangerLevels)
         time.sleep(timePeriod)
